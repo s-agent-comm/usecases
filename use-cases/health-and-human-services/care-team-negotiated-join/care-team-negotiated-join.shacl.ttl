@@ -1,0 +1,66 @@
+# Case-specific shapes for use case A. The four generic checks are in ../shared/four-checks.shacl.ttl.
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix a:    <https://example.org/sac/hhs/care-team-negotiated-join/shapes#> .
+
+a: sh:declare
+    [ sh:prefix "core" ;   sh:namespace "https://w3id.org/agent-ontology/core#"^^xsd:anyURI ] ,
+    [ sh:prefix "del" ;    sh:namespace "https://w3id.org/agent-ontology/delegation#"^^xsd:anyURI ] ,
+    [ sh:prefix "cap" ;    sh:namespace "https://w3id.org/agent-ontology/capability#"^^xsd:anyURI ] ,
+    [ sh:prefix "ledger" ; sh:namespace "https://w3id.org/agent-ontology/ledger#"^^xsd:anyURI ] ,
+    [ sh:prefix "ucm" ;    sh:namespace "https://www.w3.org/ns/ucm#"^^xsd:anyURI ] ,
+    [ sh:prefix "ext" ;    sh:namespace "https://example.org/sac-ucm-ext#"^^xsd:anyURI ] ,
+    [ sh:prefix "prov" ;   sh:namespace "http://www.w3.org/ns/prov#"^^xsd:anyURI ] ,
+    [ sh:prefix "acl" ;    sh:namespace "http://www.w3.org/ns/auth/acl#"^^xsd:anyURI ] ,
+    [ sh:prefix "dcterms" ; sh:namespace "http://purl.org/dc/terms/"^^xsd:anyURI ] ,
+    [ sh:prefix "hev" ;    sh:namespace "http://w3id.org/holon/event/"^^xsd:anyURI ] .
+
+a:HandshakeShape a sh:NodeShape ;
+    sh:targetClass ucm:Handshake ;
+    sh:property [ sh:path ucm:negotiates ; sh:minCount 1 ; sh:class ucm:CareCoordinationInteraction ] ;
+    sh:property [ sh:path ucm:hasLifecycleState ; sh:hasValue ucm:Accepted ] ;
+    sh:sparql [
+        sh:message "A handshake must be the output of an admitted, recorded action by the accepting agent." ;
+        sh:prefixes a: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ucm:Handshake .
+                FILTER NOT EXISTS { ?act core:producesArtifact $this .
+                                    ?e ledger:action ?act ; ext:verdict "admit" }
+            }""" ] .
+
+a:NegotiatedMembershipShape a sh:NodeShape ;
+    sh:targetClass ucm:CareTeam ;
+    sh:property [ sh:path ucm:definedByCriteria ; sh:minCount 1 ] ;
+    sh:sparql [
+        sh:message "Membership is negotiated: an invited member's organization must have accepted a handshake." ;
+        sh:prefixes a: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ucm:hasMember ?value . ?value ucm:affiliatedWith ?org .
+                ?agent prov:actedOnBehalfOf ?org . ?d del:delegatesTo ?agent ; del:delegatedBy ?inviter .
+                FILTER NOT EXISTS { ?inviter prov:actedOnBehalfOf ?p . ?p a ucm:Person }
+                FILTER NOT EXISTS { ?org ucm:acceptsRequest/ucm:occursWithin ?h .
+                                    ?h a ucm:Handshake ; ucm:hasLifecycleState ucm:Accepted }
+            }""" ] .
+
+a:IdentityShape a sh:NodeShape ;
+    sh:targetClass ucm:MatchClaim ;
+    sh:property [ sh:path ucm:statementSubject ; sh:minCount 1 ] ;
+    sh:property [ sh:path ucm:madeWithinContext ; sh:minCount 1 ] ;
+    sh:property [ sh:path ucm:statementDate ; sh:minCount 1 ] ;
+    sh:property [ sh:path [ sh:inversePath core:producesArtifact ] ; sh:minCount 1 ] .
+
+a:ConsentTermsShape a sh:NodeShape ;
+    sh:targetClass ucm:PolicyDefinition ;
+    sh:sparql [
+        sh:message "Terms attached to an acceptance must be enforced by an ACL rule in the Pod (dcterms:conformsTo)." ;
+        sh:prefixes a: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ucm:PolicyDefinition .
+                FILTER NOT EXISTS { ?r a acl:Authorization ; dcterms:conformsTo $this }
+            }""" ] .

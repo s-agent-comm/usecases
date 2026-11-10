@@ -1,0 +1,14 @@
+# kind	time	actor	delegation	governanceAction|capability	action	verdict	note
+G	2026-09-14T09:00:00Z	dlock:locker-agent	:d1	Grant	-	-	Riverbend becomes coordinator: rule added to discharge-coordination/.acl
+G	2026-09-14T11:20:00Z	rb:agent	:d2	Grant	-	-	Harborlight joins for housing tasks: locker agent adds its rule at Riverbend's request
+R	2026-09-30T10:00:00Z	hl:agent	:d2	:capHousingTasks	:actLeaseTask	admit	Lease-signing task update appended
+R	2026-10-02T11:50:00Z	rb:agent	:d1	:capCoordinate	:actHandoffNote	admit	Open-task handoff note written
+G	2026-10-02T12:00:00Z	rb:agent	:d2	Revoke	-	-	Riverbend withdraws Harborlight's authority: locker agent removes the rule
+G	2026-10-02T12:00:00Z	dlock:locker-agent	:d1	Revoke	-	-	Riverbend's coordinator rule removed from the .acl
+G	2026-10-02T12:00:00Z	dlock:locker-agent	:d3	Grant	-	-	Riverbend's follow-up rule added to clinical/.acl
+G	2026-10-02T12:00:00Z	dlock:locker-agent	:d4	Grant	-	-	Eastside's coordinator rule added to discharge-coordination/.acl
+G	2026-10-02T12:05:00Z	es:agent	:d5	Grant	-	-	Eastside re-issues Harborlight's housing tasks: locker agent adds the rule
+R	2026-10-03T09:00:00Z	rb:agent	:d1	:capCoordinate	:actLateRequest	deny	Denied: coordinator delegation was revoked
+R	2026-10-03T09:30:00Z	hl:agent	:d2	:capHousingTasks	:actStaleLease	deny	Denied: the old Riverbend authority was revoked
+R	2026-10-03T10:00:00Z	hl:agent	:d5	:capHousingTasks	:actLeaseTask2	admit	Lease task update appended under Eastside's authority
+R	2026-10-09T10:00:00Z	rb:agent	:d3	:capFollowUp	:actFollowUpCall	admit	7-day follow-up call note appended

@@ -1,0 +1,706 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#AgentShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b12"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b15"
+        }
+      ],
+      "sh:sparql": {
+        "@id": "_:n6d1781c00f4a4b14939bde912d334596b16"
+      },
+      "sh:targetClass": {
+        "@id": "core:Agent"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b12",
+      "sh:message": "Agent needs a DID.",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@list": [
+          {
+            "@id": "agent:hasIdentity"
+          },
+          {
+            "@id": "id:did"
+          }
+        ]
+      },
+      "sh:pattern": "^did:"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b15",
+      "sh:message": "Agent needs a principal it acts on behalf of (prov:actedOnBehalfOf, as in the Pod's locker agent).",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "prov:actedOnBehalfOf"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b16",
+      "sh:message": "The agent must be identified by an https WebID, so that a Pod's access control rules can name it.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "SELECT $this WHERE { $this a core:Agent . FILTER (!STRSTARTS(STR($this), \"https://\")) }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#GovernanceEventShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b56"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b61"
+        }
+      ],
+      "sh:sparql": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b62"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b63"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b64"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "ledger:GovernanceLedgerEvent"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b56",
+      "sh:in": {
+        "@list": [
+          {
+            "@id": "ext:Grant"
+          },
+          {
+            "@id": "ext:Revoke"
+          },
+          {
+            "@id": "ext:Suspend"
+          },
+          {
+            "@id": "ext:Reinstate"
+          }
+        ]
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:governanceAction"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b61",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:delegation"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b62",
+      "sh:message": "Check 4: only the delegator may change a delegation's state.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this ledger:actor ?a ; ledger:delegation ?d .\n                FILTER NOT EXISTS { ?d del:delegatedBy ?a }\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b63",
+      "sh:message": "Check 4: orphaned authorization. Revoking a delegation must also revoke every sub-delegation issued under it.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ledger:governanceAction ext:Revoke ; ledger:delegation ?d .\n                ?d del:delegatesTo ?mid .\n                ?chain del:hasDelegation ?d , ?value .\n                ?value del:delegatedBy ?mid .\n                FILTER NOT EXISTS { ?r a ledger:GovernanceLedgerEvent ; ledger:delegation ?value ;\n                                       ledger:governanceAction ext:Revoke }\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b64",
+      "sh:message": "Check 4: a revoked delegation must carry an end date (del:validUntil) on its scope.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this ledger:governanceAction ext:Revoke ; ledger:delegation ?d .\n                FILTER NOT EXISTS { ?d del:delegationScope/del:validUntil ?t }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#ChainShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b32"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b33"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "del:DelegationChain"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b32",
+      "sh:message": "Check 1: a sub-delegation may not grant a capability its parent did not grant (attenuation).",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this del:hasDelegation ?value , ?parent .\n                ?parent del:delegatesTo ?issuer . ?value del:delegatedBy ?issuer .\n                ?value del:delegationScope/del:allowedCapability ?c .\n                FILTER NOT EXISTS { $this del:hasDelegation ?p2 . ?p2 del:delegatesTo ?issuer ;\n                                    del:delegationScope/del:allowedCapability ?c }\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b33",
+      "sh:message": "Check 1: the chain needs exactly one root issuer, so every delegation traces back to one principal.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                { SELECT $this (COUNT(DISTINCT ?issuer) AS ?n) WHERE {\n                    $this a del:DelegationChain .\n                    OPTIONAL { $this del:hasDelegation ?root . ?root del:delegatedBy ?issuer .\n                        FILTER NOT EXISTS { $this del:hasDelegation ?up . ?up del:delegatesTo ?issuer } }\n                  } GROUP BY $this }\n                FILTER (?n != 1)\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#",
+      "sh:declare": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b1"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b2"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b3"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b4"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b5"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b6"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b7"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b8"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b9"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b10"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b11"
+        }
+      ]
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b1",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/core#"
+      },
+      "sh:prefix": "core"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b2",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/agent#"
+      },
+      "sh:prefix": "agent"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b3",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/identity#"
+      },
+      "sh:prefix": "id"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b4",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/delegation#"
+      },
+      "sh:prefix": "del"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b5",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/capability#"
+      },
+      "sh:prefix": "cap"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b6",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/ledger#"
+      },
+      "sh:prefix": "ledger"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b7",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://www.w3.org/ns/ucm#"
+      },
+      "sh:prefix": "ucm"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b8",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://example.org/sac-ucm-ext#"
+      },
+      "sh:prefix": "ext"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b9",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/prov#"
+      },
+      "sh:prefix": "prov"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b10",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/auth/acl#"
+      },
+      "sh:prefix": "acl"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b11",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://w3id.org/holon/event/"
+      },
+      "sh:prefix": "hev"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#DelegationShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b20"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b21"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b22"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b23"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b24"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b27"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b30"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "del:Delegation"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b20",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "del:delegationId"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b21",
+      "sh:class": {
+        "@id": "core:Agent"
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "del:delegatedBy"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b22",
+      "sh:class": {
+        "@id": "core:Agent"
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "del:delegatesTo"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b23",
+      "sh:class": {
+        "@id": "del:DelegationScope"
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "del:delegationScope"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b24",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@list": [
+          {
+            "@id": "del:delegationScope"
+          },
+          {
+            "@id": "del:allowedCapability"
+          }
+        ]
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b27",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@list": [
+          {
+            "@id": "del:delegationScope"
+          },
+          {
+            "@id": "del:validFrom"
+          }
+        ]
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b30",
+      "sh:message": "Delegation must be granted by a signed ledger event.",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "_:n6d1781c00f4a4b14939bde912d334596b31"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b31",
+      "sh:inversePath": {
+        "@id": "ledger:delegation"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#LedgerEventShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b34"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b35"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b36"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b37"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b38"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b39"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b40"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b41"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b42"
+        }
+      ],
+      "sh:sparql": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b43"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b44"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b45"
+        }
+      ],
+      "sh:targetClass": [
+        {
+          "@id": "ledger:RuntimeLedgerEvent"
+        },
+        {
+          "@id": "ledger:GovernanceLedgerEvent"
+        }
+      ]
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b34",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:eventId"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b35",
+      "sh:datatype": {
+        "@id": "xsd:integer"
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "hev:eventSequence"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b36",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:hash"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b37",
+      "sh:maxCount": 1,
+      "sh:path": {
+        "@id": "ledger:previousEventHash"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b38",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:signature"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b39",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:proofType"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b40",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:publicKey"
+      },
+      "sh:pattern": "^did:"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b41",
+      "sh:class": {
+        "@id": "core:Agent"
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:actor"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b42",
+      "sh:hasValue": true,
+      "sh:path": {
+        "@id": "ledger:appendOnly"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b43",
+      "sh:message": "Check 2: the event must be signed with a key of its own actor's DID.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ledger:publicKey ?value ; ledger:actor ?a . ?a agent:hasIdentity/id:did ?did .\n                FILTER (!STRSTARTS(?value, CONCAT(?did, \"#\")))\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b44",
+      "sh:message": "Check 2: the log is not contiguous. previousEventHash must equal the hash of the event one position earlier.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this hev:eventSequence ?n .\n                OPTIONAL { $this ledger:previousEventHash ?prev }\n                OPTIONAL { ?before hev:eventSequence ?m ; ledger:hash ?h . FILTER (?m = ?n - 1) }\n                FILTER ( (?n = 1 && BOUND(?prev)) || (?n > 1 && (!BOUND(?prev) || !BOUND(?h) || ?prev != ?h)) )\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b45",
+      "sh:message": "Check 2: two events share a position or a hash (fork).",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this hev:eventSequence ?n ; ledger:hash ?h .\n                ?other hev:eventSequence ?n2 ; ledger:hash ?h2 .\n                FILTER (?other != $this && (?n = ?n2 || ?h = ?h2))\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#ConsentShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b17"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b18"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b19"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "del:Delegation"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b17",
+      "sh:message": "Consent missing: this delegation grants Pod access, so it needs a consent record (an acl:Authorization) whose acl:agent is the delegate.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this del:delegationScope/del:allowedCapability/cap:requiresPermission ?m ; del:delegatesTo ?to .\n                FILTER STRSTARTS(?m, \"http://www.w3.org/ns/auth/acl#\")\n                FILTER NOT EXISTS { $this ext:consentRecord ?r . ?r a acl:Authorization ; acl:agent ?to }\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b18",
+      "sh:message": "Consent too narrow: a capability in this delegation needs an access mode that no consent record grants.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this del:delegationScope/del:allowedCapability ?value . ?value cap:requiresPermission ?m .\n                FILTER STRSTARTS(?m, \"http://www.w3.org/ns/auth/acl#\")\n                FILTER NOT EXISTS { $this ext:consentRecord/acl:mode ?mode . FILTER (STR(?mode) = ?m) }\n            }"
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b19",
+      "sh:message": "Consent in the wrong place: the record must be a rule in a .acl resource in the Pod of the person at the root of the chain.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ext:consentRecord ?value .\n                ?chain del:hasDelegation $this , ?root . ?root del:delegatedBy ?issuer .\n                FILTER NOT EXISTS { ?chain del:hasDelegation ?up . ?up del:delegatesTo ?issuer }\n                ?issuer prov:actedOnBehalfOf ?person .\n                BIND (STRBEFORE(STR(?person), \"profile/card.jsonld\") AS ?pod)\n                FILTER (?pod = \"\" || !STRSTARTS(STR(?value), ?pod) || !CONTAINS(STR(?value), \"/.acl#\"))\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/four-checks#RuntimeEventShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b46"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b49"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b50"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b51"
+        },
+        {
+          "@id": "_:n6d1781c00f4a4b14939bde912d334596b52"
+        }
+      ],
+      "sh:sparql": {
+        "@id": "_:n6d1781c00f4a4b14939bde912d334596b55"
+      },
+      "sh:targetClass": {
+        "@id": "ledger:RuntimeLedgerEvent"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b46",
+      "sh:in": {
+        "@list": [
+          "admit",
+          "deny"
+        ]
+      },
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ext:verdict"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b49",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:action"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b50",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:usesCapability"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b51",
+      "sh:maxCount": 1,
+      "sh:message": "Every gated action cites exactly one delegation as its authority.",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ledger:delegation"
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b52",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@list": [
+          {
+            "@id": "ledger:executionContext"
+          },
+          {
+            "@id": "sec:hasAccessControlRule"
+          }
+        ]
+      }
+    },
+    {
+      "@id": "_:n6d1781c00f4a4b14939bde912d334596b55",
+      "sh:message": "Check 3: the verdict does not reproduce. 'admit' requires that the actor is the delegate, the capability is in scope, neither the delegation nor any delegation above it in the chain is revoked or suspended at this point in the log, the target's UCM context is one the capability allows, and, for Pod data, the delegation's consent record grants the actor that access mode on a container holding the target; anything else must be 'deny'.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/four-checks#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ext:verdict ?value ; hev:eventSequence ?n ; ledger:actor ?actor ;\n                      ledger:usesCapability ?c ; ledger:delegation ?d .\n                BIND ( EXISTS { ?d del:delegatesTo ?actor } AS ?isDelegate )\n                BIND ( EXISTS { ?d del:delegationScope/del:allowedCapability ?c } AS ?inScope )\n                BIND ( EXISTS { ?g a ledger:GovernanceLedgerEvent ; ledger:delegation ?d ;\n                                   ledger:governanceAction ext:Grant ; hev:eventSequence ?gn . FILTER (?gn < ?n) } AS ?granted )\n                BIND ( EXISTS { ?chain del:hasDelegation ?d , ?anc .\n                                ?d (del:delegatedBy/^del:delegatesTo)* ?anc .\n                                ?s a ledger:GovernanceLedgerEvent ; ledger:delegation ?anc ;\n                                   ledger:governanceAction ?act ; hev:eventSequence ?sn .\n                                FILTER (?act IN (ext:Revoke, ext:Suspend) && ?sn < ?n)\n                                FILTER NOT EXISTS { ?r a ledger:GovernanceLedgerEvent ; ledger:delegation ?anc ;\n                                   ledger:governanceAction ext:Reinstate ; hev:eventSequence ?rn . FILTER (?rn > ?sn && ?rn < ?n) } } AS ?stopped )\n                BIND ( EXISTS { $this ledger:action/(prov:used|core:producesArtifact) ?res . ?res ucm:madeWithinContext/a ?ctxClass .\n                                ?c cap:hasConstraint ?k .\n                                FILTER NOT EXISTS { ?c cap:hasConstraint/cap:allowedContext ?ok . FILTER (?ok = STR(?ctxClass)) } } AS ?wrongContext )\n                BIND ( EXISTS { ?c cap:requiresPermission ?m0 . FILTER STRSTARTS(?m0, \"http://www.w3.org/ns/auth/acl#\") } AS ?needsPod )\n                BIND ( EXISTS { $this ledger:action/(prov:used|core:producesArtifact) ?res .\n                                ?c cap:requiresPermission ?m .\n                                ?d ext:consentRecord ?r . ?r acl:agent ?actor ; acl:mode ?mode ; acl:default ?cont .\n                                FILTER (STR(?mode) = ?m && STRSTARTS(STR(?res), STR(?cont))) } AS ?podAllows )\n                BIND ( IF(?isDelegate && ?inScope && ?granted && !?stopped && !?wrongContext && (!?needsPod || ?podAllows), \"admit\", \"deny\") AS ?expected )\n                FILTER (?value != ?expected)\n            }"
+    }
+  ]
+}

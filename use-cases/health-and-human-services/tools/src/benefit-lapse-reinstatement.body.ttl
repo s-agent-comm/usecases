@@ -1,0 +1,156 @@
+@prefix : <https://example.org/sac/hhs/benefit-lapse-reinstatement#> .
+
+# Use case D. Benefit lapse and reinstatement.
+# Source: UCM nutrition story, steps 6 to 11 and the "a lapse is visible" criterion.
+# All people, organizations and programs are fictional. Signatures are placeholders.
+#
+# Three Solid Pods: Delphine's (her benefits holon), Jules's (his income holon), and one
+# for the household as a group, which keeps the benefit log. The county reads income
+# and writes the eligibility result only where an ACL rule in the owner's Pod allows it.
+
+@prefix dme:    <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:  <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dbenb:  <https://pod.example/delphine/holon/benefits/boundary.jsonld#> .
+@prefix dben:   <https://pod.example/delphine/holon/benefits/event.jsonld#> .
+@prefix dbenacl: <https://pod.example/delphine/holon/benefits/.acl#> .
+@prefix jme:    <https://pod.example/jules/profile/card.jsonld#> .
+@prefix jlock:  <https://pod.example/jules/holon/boundary.jsonld#> .
+@prefix jincb:  <https://pod.example/jules/holon/income/boundary.jsonld#> .
+@prefix jinc:   <https://pod.example/jules/holon/income/event.jsonld#> .
+@prefix jincacl: <https://pod.example/jules/holon/income/.acl#> .
+@prefix hme:    <https://pod.example/arceneaux-household/profile/card.jsonld#> .
+@prefix hlock:  <https://pod.example/arceneaux-household/holon/boundary.jsonld#> .
+@prefix log:    <https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#> .
+@prefix county: <https://bramble-county.example/agents/benefits#> .
+
+##### Solid Pods #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" ; ucm:hasMembership hlock:m-delphine ;
+    ucm:participatesThrough dben:p-client , dben:benefit-1 , dben:benefit-2 .
+jme:me a ucm:Person ; rdfs:label "Jules Arceneaux" ; ucm:hasMembership hlock:m-jules ;
+    ucm:participatesThrough jinc:p-client .
+
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ; dcterms:subject dme:me ; holon:contains dbenb:holon .
+dbenb:holon a holon:ProcessHolon ; rdfs:label "Delphine's food benefit" ; holon:partOf dlock:holon .
+jlock:holon a holon:AgentHolon ; rdfs:label "Jules's personal data locker" ; dcterms:subject jme:me ; holon:contains jincb:holon .
+jincb:holon a holon:DataHolon ; rdfs:label "Jules's income" ; holon:partOf jlock:holon .
+hlock:holon a holon:AgentHolon ; rdfs:label "Household data locker" ; dcterms:subject hme:us .
+
+# Consent records. Each person consents in their own Pod.
+dbenacl:county a acl:Authorization ; acl:agent county:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/benefits/> ;
+    acl:default  <https://pod.example/delphine/holon/benefits/> ;
+    acl:mode acl:Read , acl:Append .
+jincacl:county a acl:Authorization ; acl:agent county:agent ;
+    acl:accessTo <https://pod.example/jules/holon/income/> ;
+    acl:default  <https://pod.example/jules/holon/income/> ;
+    acl:mode acl:Read .
+
+##### UCM content #####
+
+:county a ucm:Organization ; rdfs:label "Bramble County Department of Human Services" .
+
+hme:us a ucm:Household ; rdfs:label "Delphine and Jules's grocery unit" ;
+    ucm:hasMember dme:me , jme:me ; ucm:definedByCriteria hlock:buys-together .
+hlock:buys-together a ucm:MembershipCriteria ; rdfs:label "Buy and prepare food together" .
+hlock:m-delphine a ucm:Membership ; ucm:membershipIn hme:us .
+hlock:m-jules    a ucm:Membership ; ucm:membershipIn hme:us .
+
+dbenb:fresh-plate a ucm:ProgramDefinition ; rdfs:label "FreshPlate Food Benefit (fictional)" .
+dbenb:fresh-plate-rules a ucm:EligibilityRuleset ; rdfs:label "FreshPlate eligibility rules. The income limit lives in the implementation model, not here." .
+dbenb:social-context a ucm:SocialCareContext ; ucm:definedByArtifact dbenb:fresh-plate-rules .
+dbenb:client-role a ucm:ClientRole . dbenb:beneficiary-role a ucm:BeneficiaryRole .
+
+dben:determination a ucm:EligibilityDetermination ; rdfs:label "FreshPlate eligibility determination" .
+dben:p-client a ucm:Participation ; ucm:assumesRole dbenb:client-role ; ucm:occursWithin dben:determination ; ucm:scopedBy dbenb:social-context .
+jinc:p-client a ucm:Participation ; ucm:assumesRole dbenb:client-role ; ucm:occursWithin dben:determination ; ucm:scopedBy dbenb:social-context .
+
+jinc:wages a ucm:SocialCareStatement , core:Artifact ; rdfs:label "Household income: Jules's warehouse wages (pay stubs)" ;
+    ucm:madeWithinContext dbenb:social-context ; ucm:statementSubject jinc:p-client ;
+    ucm:statementDate "2026-11-12T10:00:00Z"^^xsd:dateTime .
+dben:eligible a ucm:SocialCareStatement , core:Artifact ; rdfs:label "Household is eligible for FreshPlate" ;
+    ucm:madeWithinContext dbenb:social-context ; ucm:statementSubject dben:p-client ;
+    ucm:statementDate "2026-11-17T10:00:00Z"^^xsd:dateTime .
+
+# The UCM workaround: one participation closes, another opens. (UCM gives lifecycle state only to processes.)
+dben:benefit-1 a ucm:Participation ; ucm:assumesRole dbenb:beneficiary-role ; ucm:scopedBy dbenb:social-context ;
+    ucm:validFrom "2026-11-17T10:00:00Z"^^xsd:dateTime ; ucm:validTo "2027-04-30T00:00:00Z"^^xsd:dateTime .
+dben:benefit-2 a ucm:Participation ; ucm:assumesRole dbenb:beneficiary-role ; ucm:scopedBy dbenb:social-context ;
+    ucm:validFrom "2027-05-21T10:00:00Z"^^xsd:dateTime .
+
+# Order without timestamps: the lapse sits after the recertification due date and before Samuel notices.
+dbenb:after-recert-due a ucm:CareTrajectoryContext ; rdfs:label "After the recertification due date" .
+dbenb:before-noticed   a ucm:CareTrajectoryContext ; rdfs:label "Before the coordinator notices the suspension" .
+dben:benefit-1 ucm:hasCareTrajectoryContext dbenb:after-recert-due , dbenb:before-noticed .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+jlock:locker-agent a core:Agent ; rdfs:label "Jules's locker agent" ;
+    prov:actedOnBehalfOf jme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:jules" ] .
+hlock:locker-agent a core:Agent ; rdfs:label "Household locker agent" ;
+    prov:actedOnBehalfOf hme:us ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:arceneaux-household" ] .
+county:agent a core:Agent ; rdfs:label "Bramble County DHS benefits agent" ;
+    prov:actedOnBehalfOf :county ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:bramble-county.example:agents:benefits" ] .
+
+##### Capabilities #####
+
+:capReadIncome a cap:Capability ; rdfs:label "Read household income statements" ;
+    cap:capabilityExpression "GET ucm:SocialCareStatement about household income" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Read" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ; cap:allowedContext "https://www.w3.org/ns/ucm#SocialCareContext" ] .
+:capDetermine a cap:Capability ; rdfs:label "Record a FreshPlate eligibility result" ;
+    cap:capabilityExpression "Append a ucm:SocialCareStatement under :fresh-plate-rules" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+:capNotify a cap:Capability ; rdfs:label "Send program notices" ;
+    cap:capabilityExpression "Send recertification and other notices by mail" .
+:capRedeem a cap:Capability ; rdfs:label "Redeem FreshPlate benefit" ;
+    cap:capabilityExpression "Pick up a FreshPlate box at the pantry" .
+
+##### Delegation #####
+
+# Consent chains: each person consents for their own data, in their own Pod.
+:consentDelphine a del:DelegationChain ; del:hasDelegation :d1 .
+:consentJules    a del:DelegationChain ; del:hasDelegation :d2 .
+# Benefit chain: the county grants the benefit to the household, which lets Jules pick up.
+# Nothing in it touches a Pod, so it needs no consent record.
+:benefitChain    a del:DelegationChain ; del:hasDelegation :d3 , :d4 .
+
+:d1 a del:Delegation ; del:delegationId "D-D1" ; del:note "Delphine consents to the county reading her benefits holon and appending the result." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo county:agent ; ext:consentRecord dbenacl:county ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capReadIncome , :capDetermine , :capNotify ;
+        del:validFrom "2026-11-10T09:00:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "D-D2" ; del:note "Jules consents to the county reading his wages. He counts as household, not as a patient." ;
+    del:delegatedBy jlock:locker-agent ; del:delegatesTo county:agent ; ext:consentRecord jincacl:county ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capReadIncome ;
+        del:validFrom "2026-11-10T09:05:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "D-D3" ; del:note "The county grants FreshPlate to the household." ;
+    del:delegatedBy county:agent ; del:delegatesTo hlock:locker-agent ;
+    ext:realizesParticipation dben:benefit-1 , dben:benefit-2 ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capRedeem ;
+        del:validFrom "2026-11-17T10:00:00Z"^^xsd:dateTime ] .
+:d4 a del:Delegation ; del:delegationId "D-D4" ; del:note "The household lets Jules, the caregiver, pick up the box." ;
+    del:delegatedBy hlock:locker-agent ; del:delegatesTo jlock:locker-agent ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capRedeem ;
+        del:validFrom "2026-11-17T10:05:00Z"^^xsd:dateTime ] .
+
+##### Intent and actions #####
+
+:steadyMealsIntent a intent:Intent ; rdfs:label "Keep the household's food benefit continuous" ;
+    intent:authorizedBy :d3 ; intent:producesAction :actPickup1 , :actPickupLapsed , :actPickup2 .
+hlock:locker-agent core:hasIntent :steadyMealsIntent .
+
+:actReadWages      a core:Action ; rdfs:label "County reads Jules's wages from his Pod" ; prov:used jinc:wages .
+:actDetermine      a core:Action ; rdfs:label "County appends the eligibility result to Delphine's Pod" ; core:producesArtifact dben:eligible .
+:actPickup1        a core:Action ; rdfs:label "Jules picks up a FreshPlate box" .
+:actRecertNotice   a core:Action ; rdfs:label "County sends a recertification notice (to the old address)" .
+:actPickupLapsed   a core:Action ; rdfs:label "Jules tries to pick up a box during the lapse" .
+:actReadWages2     a core:Action ; rdfs:label "County reads Jules's new pay stubs from his Pod" ; prov:used jinc:wages .
+:actPickup2        a core:Action ; rdfs:label "Jules picks up a box after reinstatement" .
+county:agent       core:executesAction :actReadWages , :actDetermine , :actRecertNotice , :actReadWages2 .
+jlock:locker-agent core:executesAction :actPickup1 , :actPickupLapsed , :actPickup2 .
+
+:gate a core:ExecutionContext ; rdfs:label "Authorization gate: the county benefit system, and the Pod servers for Pod data" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, no delegation on its path is revoked or suspended, and, for Pod data, an ACL rule grants the mode." ] .

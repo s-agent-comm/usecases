@@ -1,0 +1,1079 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#beneficiary-role",
+      "@type": "ucm:BeneficiaryRole"
+    },
+    {
+      "@id": "https://northgate.example/agents/coordination#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b2"
+      },
+      "core:executesAction": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actWriteSummary"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#northgate"
+      },
+      "rdfs:label": "Northgate coordination agent"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b2",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:northgate.example:agents:coordination"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate",
+      "@type": "core:ExecutionContext",
+      "rdfs:label": "Delphine's Pod server (JSS) enforcing Web Access Control",
+      "sec:hasAccessControlRule": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b12"
+      },
+      "sec:hasDataHandlingPolicy": [
+        {
+          "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b13"
+        },
+        {
+          "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b14"
+        }
+      ]
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b12",
+      "@type": "sec:AccessControlRule",
+      "sec:allowedAction": "Admit only if the actor is the delegate, the capability is in scope, the delegation is live, the target statement's context is allowed, and an ACL rule grants the actor the mode on the target's container."
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b13",
+      "@type": "sec:DataHandlingPolicy",
+      "sec:encryptionRequired": true,
+      "sec:policyURI": {
+        "@type": "xsd:anyURI",
+        "@value": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b14",
+      "@type": "sec:DataHandlingPolicy",
+      "sec:encryptionRequired": true,
+      "sec:policyURI": {
+        "@type": "xsd:anyURI",
+        "@value": "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-policy"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actWriteDietOrder",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/food-security/event.jsonld#diet-order"
+      },
+      "rdfs:label": "Riverbend's dietitian appends the diet order"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDietOrder",
+      "@type": "core:Action",
+      "prov:used": {
+        "@id": "https://pod.example/delphine/holon/food-security/event.jsonld#diet-order"
+      },
+      "rdfs:label": "Pantry reads the diet order"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadSummary",
+      "@type": "core:Action",
+      "prov:used": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#bh-summary"
+      },
+      "rdfs:label": "Riverbend reads the coordination summary"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#riverbend",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Riverbend General Hospital"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d1",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "del:delegationId": "B-D1",
+      "del:delegationScope": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b9"
+      },
+      "del:note": "Delphine consents to Northgate holding her therapy notes and appending a summary for the team.",
+      "ext:consentRecord": [
+        {
+          "@id": "https://pod.example/delphine/holon/behavioral-health/.acl#northgate"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/care-coordination/.acl#northgate"
+        }
+      ]
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b9",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadBehavioral"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capWriteCoordination"
+        }
+      ],
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T15:05:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/food-security/.acl#pantry",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/food-security/"
+      },
+      "acl:agent": {
+        "@id": "https://eastside-neighbors.example/agents/pantry#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/food-security/"
+      },
+      "acl:mode": {
+        "@id": "acl:Read"
+      },
+      "dcterms:conformsTo": {
+        "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-policy"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e03",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 3,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actWriteSummary"
+      },
+      "ledger:actor": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d1"
+      },
+      "ledger:eventId": "CSS-003",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:b2f88d5c5b82a8561b329ae34d2ca84094f4f4dbaca6e230101c4769c2f644a7",
+      "ledger:previousEventHash": "sha256:0709e4311f1a273152588c95573f253c3068a0d3b12561f204b5c03aa2f74f2d",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:northgate.example:agents:coordination#key-1",
+      "ledger:signature": "placeholder-signature-b2f88d5c5b82",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-16T09:10:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capWriteCoordination"
+      },
+      "rdfs:label": "Northgate appends a coordination summary"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e02",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 2,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d1"
+      },
+      "ledger:eventId": "CSS-002",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:0709e4311f1a273152588c95573f253c3068a0d3b12561f204b5c03aa2f74f2d",
+      "ledger:previousEventHash": "sha256:a3507dd457b49407c8826378053391bae8a7dc3932e39ceb2fa7228cb03d0960",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-0709e4311f1a",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T15:05:00+00:00"
+      },
+      "rdfs:label": "Delphine consents to Northgate, summary sharing only"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#northgate",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Northgate Community Mental Health"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e10",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "deny",
+      "hev:eventSequence": 10,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDiagnosis"
+      },
+      "ledger:actor": {
+        "@id": "https://eastside-neighbors.example/agents/pantry#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d3"
+      },
+      "ledger:eventId": "CSS-010",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:587d800431940f1b869900fa6c5e448dd49a173642af3748f18672e5af4e1f56",
+      "ledger:previousEventHash": "sha256:466fc5569271adee7fcc377d340cfa2ae8e7fe9470d54ed03873e21cbd691234",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:eastside-neighbors.example:agents:pantry#key-1",
+      "ledger:signature": "placeholder-signature-587d80043194",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T15:21:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination"
+      },
+      "rdfs:label": "Denied: the pantry has no ACL rule on the clinical container"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadTherapyNote",
+      "@type": "core:Action",
+      "prov:used": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/event.jsonld#session-note"
+      },
+      "rdfs:label": "Riverbend asks for the session note"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e08",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 8,
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d3"
+      },
+      "ledger:eventId": "CSS-008",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:59cf39125bdcfc0513bbe9610e46a8dba50acc042cc7a120d690a4daa31c09ff",
+      "ledger:previousEventHash": "sha256:8dda8eee0bb6c46bedcff1a2dbb73dfa2c3d51454c3b5a16aeb40fa2a2c13f94",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-59cf39125bdc",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T15:00:00+00:00"
+      },
+      "rdfs:label": "Riverbend passes read-coordination to the pantry"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#behavioral-context",
+      "@type": "ucm:BehavioralHealthContext",
+      "ucm:definedByArtifact": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-context",
+      "@type": "ucm:SocialCareContext",
+      "rdfs:label": "Pantry meal service",
+      "ucm:definedByArtifact": {
+        "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-policy"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actWriteSummary",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#bh-summary"
+      },
+      "rdfs:label": "Northgate appends the coordination summary"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/food-security/.acl#riverbend",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/food-security/"
+      },
+      "acl:agent": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/food-security/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#holon",
+      "@type": "holon:DataHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's clinical care"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b1"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "rdfs:label": "Delphine's locker agent (writes the .acl rules)"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b1",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:pod.example:delphine"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#patient-role",
+      "@type": "ucm:PatientRole"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-policy",
+      "@type": "ucm:PolicyDefinition",
+      "rdfs:label": "Pantry data limit: diet type and pickup details only, nothing from the Clinical Care context."
+    },
+    {
+      "@id": "https://riverbend.example/agents/care-transitions#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b3"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadSummary"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadTherapyNote"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actWriteDietOrder"
+        }
+      ],
+      "core:hasIntent": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#coordinateIntent"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#riverbend"
+      },
+      "rdfs:label": "Riverbend care transitions agent"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b3",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:riverbend.example:agents:care-transitions"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#mealsIntent",
+      "@type": "intent:Intent",
+      "intent:authorizedBy": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d3"
+      },
+      "intent:producesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDietOrder"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDiagnosis"
+        }
+      ],
+      "rdfs:label": "Fill a medically tailored meal order"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#p-patient",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#patient-role"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#clinical-context"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/.acl#riverbend",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/clinical/"
+      },
+      "acl:agent": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/clinical/"
+      },
+      "acl:mode": {
+        "@id": "acl:Read"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegationId": "B-D2",
+      "del:delegationScope": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b10"
+      },
+      "del:note": "Delphine consents to Riverbend reading clinical and coordination data. Behavioral health is not included.",
+      "ext:consentRecord": [
+        {
+          "@id": "https://pod.example/delphine/holon/clinical/.acl#riverbend"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/care-coordination/.acl#riverbend"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/food-security/.acl#riverbend"
+        }
+      ]
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b10",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadClinical"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capWriteCoordination"
+        }
+      ],
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context",
+      "@type": "ucm:SocialCareContext",
+      "rdfs:label": "Delphine's social care"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadClinical",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "GET ucm:ClinicalStatement, ucm:DiagnosisStatement",
+      "cap:hasConstraint": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b7"
+      },
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Read",
+      "rdfs:label": "Read clinical statements"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b7",
+      "@type": "cap:CapabilityConstraint",
+      "cap:allowedContext": "https://www.w3.org/ns/ucm#ClinicalCareContext",
+      "cap:prohibitedContext": "https://www.w3.org/ns/ucm#BehavioralHealthContext"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/care-coordination/.acl#riverbend",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#holon",
+      "@type": "holon:ProcessHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's food security coordination"
+    },
+    {
+      "@id": "https://eastside-neighbors.example/agents/pantry#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b4"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDietOrder"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDiagnosis"
+        }
+      ],
+      "core:hasIntent": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#mealsIntent"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#eastside"
+      },
+      "rdfs:label": "Eastside pantry agent"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b4",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:eastside-neighbors.example:agents:pantry"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#bh-summary",
+      "@type": [
+        "ucm:CareCoordinationStatement",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Summary: engaged in counseling; weekly sessions; no barriers to discharge",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-16T09:10:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#p-beneficiary"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon",
+      "@type": "holon:AgentHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "holon:contains": [
+        {
+          "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#holon"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#holon"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/care-coordination/boundary.jsonld#holon"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#holon"
+        }
+      ],
+      "rdfs:label": "Delphine's personal data locker"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e04",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 4,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadSummary"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+      },
+      "ledger:eventId": "CSS-004",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:f2e2067a1149fd93558ef63cbe98be3950b4d2a2c569b93dc19a5ecee1cb0ed4",
+      "ledger:previousEventHash": "sha256:b2f88d5c5b82a8561b329ae34d2ca84094f4f4dbaca6e230101c4769c2f644a7",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-f2e2067a1149",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-16T09:30:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination"
+      },
+      "rdfs:label": "Riverbend reads the summary"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/care-coordination/.acl#northgate",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/"
+      },
+      "acl:mode": {
+        "@id": "acl:Append"
+      },
+      "dcterms:conformsTo": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e01",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 1,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+      },
+      "ledger:eventId": "CSS-001",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:a3507dd457b49407c8826378053391bae8a7dc3932e39ceb2fa7228cb03d0960",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-a3507dd457b4",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      },
+      "rdfs:label": "Delphine consents to Riverbend's care team"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e05",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "deny",
+      "hev:eventSequence": 5,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadTherapyNote"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+      },
+      "ledger:eventId": "CSS-005",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:085a29c97c6531f1942f53cca4112c7a2d9e30e74f3adc0cd5a9fc2e0fa0070e",
+      "ledger:previousEventHash": "sha256:f2e2067a1149fd93558ef63cbe98be3950b4d2a2c569b93dc19a5ecee1cb0ed4",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-085a29c97c65",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-16T09:31:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination"
+      },
+      "rdfs:label": "Denied: no ACL rule for Riverbend on behavioral-health, and the note is in that context"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/behavioral-health/.acl#northgate",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/"
+      },
+      "acl:agent": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Write"
+        }
+      ],
+      "dcterms:conformsTo": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e09",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 9,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDietOrder"
+      },
+      "ledger:actor": {
+        "@id": "https://eastside-neighbors.example/agents/pantry#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d3"
+      },
+      "ledger:eventId": "CSS-009",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:466fc5569271adee7fcc377d340cfa2ae8e7fe9470d54ed03873e21cbd691234",
+      "ledger:previousEventHash": "sha256:59cf39125bdcfc0513bbe9610e46a8dba50acc042cc7a120d690a4daa31c09ff",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:eastside-neighbors.example:agents:pantry#key-1",
+      "ledger:signature": "placeholder-signature-466fc5569271",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T15:20:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination"
+      },
+      "rdfs:label": "Pantry reads diet type and pickup details"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#northgate-terms",
+      "@type": "ucm:PolicyDefinition",
+      "rdfs:label": "Therapy notes stay inside the Behavioral Health context; only a coordination summary is shared."
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/behavioral-health/event.jsonld#p-patient",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#patient-role"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#behavioral-context"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#chain",
+      "@type": "del:DelegationChain",
+      "del:hasDelegation": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d1"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d3"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/care-coordination/boundary.jsonld#holon",
+      "@type": "holon:ProcessHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's care coordination"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadDiagnosis",
+      "@type": "core:Action",
+      "prov:used": {
+        "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#malnutrition-dx"
+      },
+      "rdfs:label": "Pantry asks for the diagnosis"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/food-security/event.jsonld#diet-order",
+      "@type": [
+        "ucm:CareCoordinationStatement",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Diet type: soft texture, high protein. Pickup: Tuesdays.",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T14:30:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#p-beneficiary"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#holon",
+      "@type": "holon:DataHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's behavioral health"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#p-beneficiary",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#beneficiary-role"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/behavioral-health/event.jsonld#session-note",
+      "@type": "ucm:ClinicalStatement",
+      "rdfs:label": "Counseling session note",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#behavioral-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-15T16:00:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/behavioral-health/event.jsonld#p-patient"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadBehavioral",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "GET ucm:ClinicalStatement in the Behavioral Health context",
+      "cap:hasConstraint": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b8"
+      },
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Read",
+      "rdfs:label": "Read behavioral health statements"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b8",
+      "@type": "cap:CapabilityConstraint",
+      "cap:allowedContext": "https://www.w3.org/ns/ucm#BehavioralHealthContext"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#eastside",
+      "@type": "ucm:CommunityGroup",
+      "rdfs:label": "Eastside Neighbors (food pantry)"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e06",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "deny",
+      "hev:eventSequence": 6,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadTherapyNote"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+      },
+      "ledger:eventId": "CSS-006",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:07d9abb73b7aeff3313b346b6e5c5b601dd81e195f873847f882a119e61d4305",
+      "ledger:previousEventHash": "sha256:085a29c97c6531f1942f53cca4112c7a2d9e30e74f3adc0cd5a9fc2e0fa0070e",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-07d9abb73b7a",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-16T09:32:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadBehavioral"
+      },
+      "rdfs:label": "Denied: capability was never delegated to Riverbend"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "GET ucm:CareCoordinationStatement",
+      "cap:hasConstraint": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b5"
+      },
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Read",
+      "rdfs:label": "Read care coordination statements"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b5",
+      "@type": "cap:CapabilityConstraint",
+      "cap:allowedContext": "https://www.w3.org/ns/ucm#SocialCareContext",
+      "cap:prohibitedContext": [
+        "https://www.w3.org/ns/ucm#BehavioralHealthContext",
+        "https://www.w3.org/ns/ucm#ClinicalCareContext"
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#coordinateIntent",
+      "@type": "intent:Intent",
+      "intent:authorizedBy": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+      },
+      "intent:producesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadSummary"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actReadTherapyNote"
+        }
+      ],
+      "rdfs:label": "Coordinate discharge without exposing therapy notes"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capWriteCoordination",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Append ucm:CareCoordinationStatement",
+      "cap:hasConstraint": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b6"
+      },
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Append",
+      "rdfs:label": "Write care coordination statements"
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b6",
+      "@type": "cap:CapabilityConstraint",
+      "cap:allowedContext": "https://www.w3.org/ns/ucm#SocialCareContext"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#malnutrition-dx",
+      "@type": "ucm:DiagnosisStatement",
+      "rdfs:label": "Moderate malnutrition",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#clinical-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T14:00:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#p-patient"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d3",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://eastside-neighbors.example/agents/pantry#agent"
+      },
+      "del:delegationId": "B-D3",
+      "del:delegationScope": {
+        "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b11"
+      },
+      "del:note": "Riverbend passes the pantry one capability. Delphine's locker agent writes the pantry's rule on the food-security container only.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/food-security/.acl#pantry"
+      }
+    },
+    {
+      "@id": "_:n1315f3c13f844328bbfc64cdbf2d39d9b11",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capReadCoordination"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T15:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e07",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 7,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#actWriteDietOrder"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#d2"
+      },
+      "ledger:eventId": "CSS-007",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#gate"
+      },
+      "ledger:hash": "sha256:8dda8eee0bb6c46bedcff1a2dbb73dfa2c3d51454c3b5a16aeb40fa2a2c13f94",
+      "ledger:previousEventHash": "sha256:07d9abb73b7aeff3313b346b6e5c5b601dd81e195f873847f882a119e61d4305",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-8dda8eee0bb6",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-03T14:30:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing#capWriteCoordination"
+      },
+      "rdfs:label": "Diet order appended to the food-security holon"
+    },
+    {
+      "@id": "https://pod.example/delphine/profile/card.jsonld#me",
+      "@type": "ucm:Person",
+      "rdfs:label": "Delphine Arceneaux",
+      "ucm:participatesThrough": [
+        {
+          "@id": "https://pod.example/delphine/holon/behavioral-health/event.jsonld#p-patient"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#p-patient"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/care-coordination/event.jsonld#p-beneficiary"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#clinical-context",
+      "@type": "ucm:ClinicalCareContext"
+    }
+  ]
+}

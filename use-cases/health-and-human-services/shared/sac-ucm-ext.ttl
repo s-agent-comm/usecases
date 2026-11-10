@@ -1,0 +1,34 @@
+# Proposed bridging terms. NOT part of the Agent Ontology, UCM or Solid.
+# Each term marks a gap found while writing these use cases (see ../README.md).
+# Earlier drafts also proposed terms for an agent's principal, an action's target
+# and a log position; the Solid Pod model already has those (prov:actedOnBehalfOf,
+# prov:used, hev:eventSequence), so they are no longer here.
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix ledger: <https://w3id.org/agent-ontology/ledger#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix acl:  <http://www.w3.org/ns/auth/acl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+ext:consentRecord a owl:ObjectProperty ;
+    rdfs:label "consent record" ;
+    rdfs:comment "The Web Access Control rule in the data subject's Solid Pod that puts a delegation into effect. The rule is the consent; the delegation records who asked for it and under what scope." ;
+    rdfs:domain del:Delegation ; rdfs:range acl:Authorization .
+
+ext:realizesParticipation a owl:ObjectProperty ;
+    rdfs:label "realizes participation" ;
+    rdfs:comment "Links a delegation to the UCM role participation it puts into effect, so the two lifecycles can be compared." ;
+    rdfs:domain del:Delegation ; rdfs:range ucm:Participation .
+
+ext:verdict a owl:DatatypeProperty ;
+    rdfs:label "verdict" ;
+    rdfs:comment "The authorization gate's decision for the recorded action: 'admit' or 'deny'." ;
+    rdfs:domain ledger:RuntimeLedgerEvent ; rdfs:range xsd:string .
+
+ext:Grant     a ledger:GovernanceAction ; rdfs:label "Grant delegation" .
+ext:Revoke    a ledger:GovernanceAction ; rdfs:label "Revoke delegation" .
+ext:Suspend   a ledger:GovernanceAction ; rdfs:label "Suspend delegation" .
+ext:Reinstate a ledger:GovernanceAction ; rdfs:label "Reinstate delegation" .

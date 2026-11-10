@@ -1,0 +1,208 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#",
+      "sh:declare": [
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb1"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb2"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb3"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb4"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb5"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb6"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb7"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb8"
+        }
+      ]
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb1",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/delegation#"
+      },
+      "sh:prefix": "del"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb2",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/ledger#"
+      },
+      "sh:prefix": "ledger"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb3",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://www.w3.org/ns/ucm#"
+      },
+      "sh:prefix": "ucm"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb4",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://example.org/sac-ucm-ext#"
+      },
+      "sh:prefix": "ext"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb5",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/prov#"
+      },
+      "sh:prefix": "prov"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb6",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/auth/acl#"
+      },
+      "sh:prefix": "acl"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb7",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://purl.org/dc/terms/"
+      },
+      "sh:prefix": "dcterms"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb8",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://w3id.org/holon/event/"
+      },
+      "sh:prefix": "hev"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#NoCoordinatorGapShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": [
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb11"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb12"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "ucm:CoordinatorRole"
+      }
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb11",
+      "sh:message": "Coordination gap: a coordinator participation ended and no other began at that moment.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                ?value ucm:assumesRole $this ; ucm:validTo ?end .\n                FILTER NOT EXISTS { ?next ucm:assumesRole $this ; ucm:validFrom ?end . FILTER (?next != ?value) }\n            }"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb12",
+      "sh:message": "Two coordinators at once: coordinator participations overlap.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                ?value ucm:assumesRole $this ; ucm:validFrom ?s1 . ?other ucm:assumesRole $this ; ucm:validFrom ?s2 .\n                FILTER (?value != ?other && ?s1 < ?s2)\n                OPTIONAL { ?value ucm:validTo ?e1 }\n                FILTER (!BOUND(?e1) || ?e1 > ?s2)\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#RoleMatchesDelegationShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": [
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb9"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb10"
+        }
+      ],
+      "sh:targetSubjectsOf": {
+        "@id": "ext:realizesParticipation"
+      }
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb9",
+      "sh:message": "The role participation and the delegation that realizes it must start together.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ext:realizesParticipation ?value ; del:delegationScope/del:validFrom ?a .\n                ?value ucm:validFrom ?b . FILTER (?a != ?b)\n            }"
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb10",
+      "sh:message": "If the role participation has ended, the delegation must have been revoked at the same moment.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ext:realizesParticipation ?value . ?value ucm:validTo ?end .\n                FILTER NOT EXISTS { ?r ledger:delegation $this ; ledger:governanceAction ext:Revoke ; ledger:timestamp ?end }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff/shapes#PeopleUnchangedShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb13"
+        },
+        {
+          "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb14"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "ucm:Person"
+      }
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb13",
+      "sh:message": "Roles live on participations, never on the Person.",
+      "sh:path": {
+        "@id": "ucm:participatesThrough"
+      }
+    },
+    {
+      "@id": "_:na4290d41f3024d55af0d0f3d024b12cfb14",
+      "sh:maxCount": 0,
+      "sh:path": {
+        "@id": "ucm:assumesRole"
+      }
+    }
+  ]
+}

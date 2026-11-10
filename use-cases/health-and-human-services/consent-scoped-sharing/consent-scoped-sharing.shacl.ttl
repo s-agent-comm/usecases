@@ -1,0 +1,74 @@
+# Case-specific shapes for use case B. The four generic checks are in ../shared/four-checks.shacl.ttl.
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix b:    <https://example.org/sac/hhs/consent-scoped-sharing/shapes#> .
+
+b: sh:declare
+    [ sh:prefix "core" ;   sh:namespace "https://w3id.org/agent-ontology/core#"^^xsd:anyURI ] ,
+    [ sh:prefix "del" ;    sh:namespace "https://w3id.org/agent-ontology/delegation#"^^xsd:anyURI ] ,
+    [ sh:prefix "cap" ;    sh:namespace "https://w3id.org/agent-ontology/capability#"^^xsd:anyURI ] ,
+    [ sh:prefix "ledger" ; sh:namespace "https://w3id.org/agent-ontology/ledger#"^^xsd:anyURI ] ,
+    [ sh:prefix "ucm" ;    sh:namespace "https://www.w3.org/ns/ucm#"^^xsd:anyURI ] ,
+    [ sh:prefix "ext" ;    sh:namespace "https://example.org/sac-ucm-ext#"^^xsd:anyURI ] ,
+    [ sh:prefix "prov" ;   sh:namespace "http://www.w3.org/ns/prov#"^^xsd:anyURI ] ,
+    [ sh:prefix "acl" ;    sh:namespace "http://www.w3.org/ns/auth/acl#"^^xsd:anyURI ] ,
+    [ sh:prefix "dcterms" ; sh:namespace "http://purl.org/dc/terms/"^^xsd:anyURI ] ,
+    [ sh:prefix "hev" ;    sh:namespace "http://w3id.org/holon/event/"^^xsd:anyURI ] .
+
+b:StatementShape a sh:NodeShape ;
+    sh:targetClass ucm:ClinicalStatement , ucm:DiagnosisStatement , ucm:CareCoordinationStatement ;
+    sh:property [ sh:path ucm:madeWithinContext ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ucm:statementSubject ; sh:minCount 1 ] ;
+    sh:property [ sh:path ucm:statementDate ; sh:minCount 1 ] .
+
+b:BehavioralHealthStaysInContextShape a sh:NodeShape ;
+    sh:targetClass ucm:BehavioralHealthContext ;
+    sh:property [ sh:path ucm:definedByArtifact ; sh:minCount 1 ; sh:class ucm:PolicyDefinition ] ;
+    sh:sparql [
+        sh:message "Consent limit breached: a statement in the Behavioral Health context was admitted to an agent that holds no behavioral health capability." ;
+        sh:prefixes b: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                ?s ucm:madeWithinContext $this .
+                ?value ledger:action/(prov:used|core:producesArtifact) ?s ; ext:verdict "admit" ; ledger:actor ?who .
+                FILTER NOT EXISTS { ?d del:delegatesTo ?who ; del:delegationScope/del:allowedCapability ?c .
+                                    ?c cap:hasConstraint/cap:allowedContext "https://www.w3.org/ns/ucm#BehavioralHealthContext" }
+            }""" ] .
+
+b:PantrySeesOnlyWhatWasAgreedShape a sh:NodeShape ;
+    sh:targetClass ucm:CommunityGroup ;
+    sh:sparql [
+        sh:message "The pantry's agent was admitted to a statement outside the Social Care context." ;
+        sh:prefixes b: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                ?agent prov:actedOnBehalfOf $this .
+                ?value ledger:actor ?agent ; ext:verdict "admit" ; ledger:action/(prov:used|core:producesArtifact) ?s .
+                ?s ucm:madeWithinContext ?ctx .
+                FILTER NOT EXISTS { ?ctx a ucm:SocialCareContext }
+            }""" ] .
+
+b:DenialsAreRecordedShape a sh:NodeShape ;
+    sh:targetClass ucm:PolicyDefinition ;
+    sh:sparql [
+        sh:message "Each consent policy should be shown at work: at least one denied request must be on the record." ;
+        sh:prefixes b: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ucm:PolicyDefinition .
+                FILTER NOT EXISTS { ?e ext:verdict "deny" }
+            }""" ] .
+
+b:PolicyEnforcedInPodShape a sh:NodeShape ;
+    sh:targetClass ucm:PolicyDefinition ;
+    sh:sparql [
+        sh:message "Each consent policy must be enforced by at least one ACL rule in Delphine's Pod (dcterms:conformsTo)." ;
+        sh:prefixes b: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ucm:PolicyDefinition .
+                FILTER NOT EXISTS { ?r a acl:Authorization ; dcterms:conformsTo $this }
+            }""" ] .

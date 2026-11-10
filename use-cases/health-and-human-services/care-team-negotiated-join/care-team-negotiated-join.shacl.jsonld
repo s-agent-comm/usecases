@@ -1,0 +1,285 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#IdentityShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab16"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab17"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab18"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab19"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "ucm:MatchClaim"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab16",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:statementSubject"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab17",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:madeWithinContext"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab18",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:statementDate"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab19",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab20"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab20",
+      "sh:inversePath": {
+        "@id": "core:producesArtifact"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#ConsentTermsShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": {
+        "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab21"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:PolicyDefinition"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab21",
+      "sh:message": "Terms attached to an acceptance must be enforced by an ACL rule in the Pod (dcterms:conformsTo).",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this a ucm:PolicyDefinition .\n                FILTER NOT EXISTS { ?r a acl:Authorization ; dcterms:conformsTo $this }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#",
+      "sh:declare": [
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab1"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab2"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab3"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab4"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab5"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab6"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab7"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab8"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab9"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab10"
+        }
+      ]
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab1",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/core#"
+      },
+      "sh:prefix": "core"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab2",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/delegation#"
+      },
+      "sh:prefix": "del"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab3",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/capability#"
+      },
+      "sh:prefix": "cap"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab4",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/ledger#"
+      },
+      "sh:prefix": "ledger"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab5",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://www.w3.org/ns/ucm#"
+      },
+      "sh:prefix": "ucm"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab6",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://example.org/sac-ucm-ext#"
+      },
+      "sh:prefix": "ext"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab7",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/prov#"
+      },
+      "sh:prefix": "prov"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab8",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/auth/acl#"
+      },
+      "sh:prefix": "acl"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab9",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://purl.org/dc/terms/"
+      },
+      "sh:prefix": "dcterms"
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab10",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://w3id.org/holon/event/"
+      },
+      "sh:prefix": "hev"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#NegotiatedMembershipShape",
+      "@type": "sh:NodeShape",
+      "sh:property": {
+        "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab14"
+      },
+      "sh:sparql": {
+        "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab15"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:CareTeam"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab14",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:definedByCriteria"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab15",
+      "sh:message": "Membership is negotiated: an invited member's organization must have accepted a handshake.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                $this ucm:hasMember ?value . ?value ucm:affiliatedWith ?org .\n                ?agent prov:actedOnBehalfOf ?org . ?d del:delegatesTo ?agent ; del:delegatedBy ?inviter .\n                FILTER NOT EXISTS { ?inviter prov:actedOnBehalfOf ?p . ?p a ucm:Person }\n                FILTER NOT EXISTS { ?org ucm:acceptsRequest/ucm:occursWithin ?h .\n                                    ?h a ucm:Handshake ; ucm:hasLifecycleState ucm:Accepted }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#HandshakeShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab11"
+        },
+        {
+          "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab12"
+        }
+      ],
+      "sh:sparql": {
+        "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab13"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:Handshake"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab11",
+      "sh:class": {
+        "@id": "ucm:CareCoordinationInteraction"
+      },
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:negotiates"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab12",
+      "sh:hasValue": {
+        "@id": "ucm:Accepted"
+      },
+      "sh:path": {
+        "@id": "ucm:hasLifecycleState"
+      }
+    },
+    {
+      "@id": "_:n6a9bb5b44bf743088b2ce6337e698a3ab13",
+      "sh:message": "A handshake must be the output of an admitted, recorded action by the accepting agent.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join/shapes#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this a ucm:Handshake .\n                FILTER NOT EXISTS { ?act core:producesArtifact $this .\n                                    ?e ledger:action ?act ; ext:verdict \"admit\" }\n            }"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# kind	time	actor	delegation	governanceAction|capability	action	verdict	note
+G	2026-09-14T09:00:00Z	dlock:locker-agent	:d1	Grant	-	-	Delphine consents to Riverbend coordinating her discharge
+R	2026-09-14T10:40:00Z	rb:agent	:d1	:capAssertMatch	:actMatch	admit	MatchClaim: Harborlight's record is Delphine's WebID
+R	2026-09-14T10:45:00Z	rb:agent	:d1	:capFormTeam	:actRequestHarborlight	admit	CoordinationRequest written for Harborlight
+R	2026-09-14T10:46:00Z	rb:agent	:d1	:capFormTeam	:actRequestNorthgate	admit	CoordinationRequest written for Northgate
+G	2026-09-14T10:47:00Z	rb:agent	:d2	Grant	-	-	Sub-delegation offered to Harborlight
+G	2026-09-14T10:48:00Z	rb:agent	:d3	Grant	-	-	Sub-delegation offered to Northgate, summaries only
+R	2026-09-14T11:20:00Z	hl:agent	:d2	:capHousingReferral	:actAcceptHarborlight	admit	Handshake accepted as is
+R	2026-09-14T15:05:00Z	ng:agent	:d3	:capShareSummary	:actAcceptNorthgate	admit	Handshake accepted on Northgate's terms

@@ -1,0 +1,11 @@
+# kind	time	actor	delegation	governanceAction|capability	action	verdict	note
+G	2026-09-14T09:00:00Z	dlock:locker-agent	:d2	Grant	-	-	Delphine consents to Riverbend's care team
+G	2026-09-14T15:05:00Z	dlock:locker-agent	:d1	Grant	-	-	Delphine consents to Northgate, summary sharing only
+R	2026-09-16T09:10:00Z	ng:agent	:d1	:capWriteCoordination	:actWriteSummary	admit	Northgate appends a coordination summary
+R	2026-09-16T09:30:00Z	rb:agent	:d2	:capReadCoordination	:actReadSummary	admit	Riverbend reads the summary
+R	2026-09-16T09:31:00Z	rb:agent	:d2	:capReadCoordination	:actReadTherapyNote	deny	Denied: no ACL rule for Riverbend on behavioral-health, and the note is in that context
+R	2026-09-16T09:32:00Z	rb:agent	:d2	:capReadBehavioral	:actReadTherapyNote	deny	Denied: capability was never delegated to Riverbend
+R	2026-11-03T14:30:00Z	rb:agent	:d2	:capWriteCoordination	:actWriteDietOrder	admit	Diet order appended to the food-security holon
+G	2026-11-03T15:00:00Z	rb:agent	:d3	Grant	-	-	Riverbend passes read-coordination to the pantry
+R	2026-11-03T15:20:00Z	pantry:agent	:d3	:capReadCoordination	:actReadDietOrder	admit	Pantry reads diet type and pickup details
+R	2026-11-03T15:21:00Z	pantry:agent	:d3	:capReadCoordination	:actReadDiagnosis	deny	Denied: the pantry has no ACL rule on the clinical container

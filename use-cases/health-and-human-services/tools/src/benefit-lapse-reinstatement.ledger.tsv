@@ -1,0 +1,14 @@
+# kind	time	actor	delegation	governanceAction|capability	action	verdict	note
+G	2026-11-10T09:00:00Z	dlock:locker-agent	:d1	Grant	-	-	Delphine consents: rule for the county added to benefits/.acl
+G	2026-11-10T09:05:00Z	jlock:locker-agent	:d2	Grant	-	-	Jules consents: rule for the county added to income/.acl
+R	2026-11-12T10:00:00Z	county:agent	:d2	:capReadIncome	:actReadWages	admit	County reads Jules's wages from his Pod
+R	2026-11-17T10:00:00Z	county:agent	:d1	:capDetermine	:actDetermine	admit	Eligibility result appended to Delphine's Pod
+G	2026-11-17T10:00:00Z	county:agent	:d3	Grant	-	-	FreshPlate granted to the household
+G	2026-11-17T10:05:00Z	hlock:locker-agent	:d4	Grant	-	-	Jules may pick up for the household
+R	2026-11-24T17:00:00Z	jlock:locker-agent	:d4	:capRedeem	:actPickup1	admit	First Tuesday pickup
+R	2027-04-01T09:00:00Z	county:agent	:d1	:capNotify	:actRecertNotice	admit	Recertification notice sent to the old address
+G	-	county:agent	:d3	Suspend	-	-	Benefit suspended for missed recertification (exact day unknown)
+R	2027-05-18T17:00:00Z	jlock:locker-agent	:d4	:capRedeem	:actPickupLapsed	deny	Denied: the household's benefit is suspended
+R	2027-05-21T09:00:00Z	county:agent	:d2	:capReadIncome	:actReadWages2	admit	County reads Jules's new pay stubs from his Pod
+G	2027-05-21T10:00:00Z	county:agent	:d3	Reinstate	-	-	Benefit reinstated
+R	2027-05-25T17:00:00Z	jlock:locker-agent	:d4	:capRedeem	:actPickup2	admit	Pickups resume

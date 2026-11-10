@@ -1,0 +1,174 @@
+@prefix : <https://example.org/sac/hhs/care-team-negotiated-join#> .
+
+# Use case A. Joining a care team by agreement.
+# Source: UCM discharge story, steps 2 to 6. All people and organizations are fictional.
+#
+# Delphine's data and consent live in her Solid Pod, laid out as in personal-data-locker:
+# her WebID is her ucm:Person, her care data sits in holon containers (each with scene,
+# boundary, event and projection graphs), and consent is a Web Access Control rule in a
+# container's .acl. https://pod.example/ stands for a JSS server. Hashes are real;
+# signatures are placeholders.
+
+@prefix dme:     <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:   <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dcoordb: <https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#> .
+@prefix dcoord:  <https://pod.example/delphine/holon/discharge-coordination/event.jsonld#> .
+@prefix dcoordacl: <https://pod.example/delphine/holon/discharge-coordination/.acl#> .
+@prefix log:     <https://pod.example/delphine/holon/access-log/event.jsonld#> .
+@prefix rb:      <https://riverbend.example/agents/care-transitions#> .
+@prefix hl:      <https://harborlight.example/agents/intake#> .
+@prefix ng:      <https://northgate.example/agents/coordination#> .
+
+##### Solid Pod: Delphine's personal data locker #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" ;
+    ucm:participatesThrough dcoord:p-delphine ; ucm:hasMembership dcoord:m-delphine .
+
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ;
+    dcterms:subject dme:me ; holon:contains dcoordb:holon .
+dcoordb:holon a holon:ProcessHolon ; rdfs:label "Delphine's discharge coordination" ;
+    holon:partOf dlock:holon ; dcterms:subject dcoord:coordination .
+
+# Consent: the rules in discharge-coordination/.acl, written by Delphine's locker agent.
+# Each one is the consent record of a delegation below.
+dcoordacl:owner a acl:Authorization ; acl:agent dme:me ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Control .
+dcoordacl:riverbend a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Append .
+dcoordacl:harborlight a acl:Authorization ; acl:agent hl:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+dcoordacl:northgate a acl:Authorization ; acl:agent ng:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append ;
+    dcterms:conformsTo dcoordb:northgate-terms .
+
+##### UCM content, stored in the discharge-coordination holon #####
+
+:tomasz a ucm:Person ; rdfs:label "Tomasz Brennan" ; ucm:affiliatedWith :riverbend ; ucm:hasMembership dcoord:m-tomasz .
+:amara  a ucm:Person ; rdfs:label "Amara Lindqvist" ; ucm:affiliatedWith :harborlight ; ucm:hasMembership dcoord:m-amara .
+:priya  a ucm:Person ; rdfs:label "Priya Castellanos" ; ucm:affiliatedWith :northgate ; ucm:hasMembership dcoord:m-priya .
+
+:riverbend   a ucm:Organization ; rdfs:label "Riverbend General Hospital" .
+:harborlight a ucm:Organization ; rdfs:label "Harborlight Housing Collaborative" ;
+    ucm:participatesThrough dcoord:p-harborlight ; ucm:acceptsRequest dcoord:p-harborlight .
+:northgate   a ucm:Organization ; rdfs:label "Northgate Community Mental Health" ;
+    ucm:participatesThrough dcoord:p-northgate ; ucm:acceptsRequest dcoord:p-northgate .
+
+dlock:social-context a ucm:SocialCareContext ; rdfs:label "Delphine's social care" .
+dcoordb:behavioral-context a ucm:BehavioralHealthContext ; ucm:definedByArtifact dcoordb:northgate-terms .
+dcoordb:northgate-terms a ucm:PolicyDefinition ;
+    rdfs:label "Northgate terms: share a coordination summary only; therapy notes stay in the Behavioral Health context" .
+dcoordb:safe-discharge a ucm:ActivityFocus ; rdfs:label "Safe discharge to stable housing" .
+dcoordb:beneficiary-role a ucm:BeneficiaryRole .
+dcoordb:provider-role    a ucm:ProviderRole .
+
+dcoord:coordination a ucm:CareCoordinationInteraction ;
+    rdfs:label "Discharge coordination for Delphine" ;
+    ucm:hasActivityFocus dcoordb:safe-discharge ; ucm:hasLifecycleState ucm:Accepted .
+dcoord:p-delphine a ucm:Participation ; ucm:assumesRole dcoordb:beneficiary-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dlock:social-context .
+
+dcoord:care-team a ucm:CareTeam ; rdfs:label "Delphine's care team" ;
+    ucm:hasMember dme:me , :tomasz , :amara , :priya ; ucm:definedByCriteria dcoordb:team-criteria .
+dcoordb:team-criteria a ucm:MembershipCriteria ; rdfs:label "Consent on file in Delphine's Pod and an accepted handshake" .
+dcoord:m-delphine a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime .
+dcoord:m-tomasz   a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime .
+dcoord:m-amara    a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T11:20:00Z"^^xsd:dateTime .
+dcoord:m-priya    a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T15:05:00Z"^^xsd:dateTime .
+
+dcoord:request-harborlight a ucm:CoordinationRequest , core:Artifact ; rdfs:label "Request: housing navigation" .
+dcoord:request-northgate   a ucm:CoordinationRequest , core:Artifact ; rdfs:label "Request: behavioral health coordination" .
+dcoord:handshake-harborlight a ucm:Handshake , core:Artifact ;
+    ucm:negotiates dcoord:coordination ; ucm:hasLifecycleState ucm:Accepted .
+dcoord:handshake-northgate   a ucm:Handshake , core:Artifact ;
+    ucm:negotiates dcoord:coordination ; ucm:hasLifecycleState ucm:Accepted .
+dcoord:p-harborlight a ucm:Participation ; ucm:assumesRole dcoordb:provider-role ;
+    ucm:occursWithin dcoord:handshake-harborlight ; ucm:scopedBy dlock:social-context .
+dcoord:p-northgate   a ucm:Participation ; ucm:assumesRole dcoordb:provider-role ;
+    ucm:occursWithin dcoord:handshake-northgate ; ucm:scopedBy dcoordb:behavioral-context .
+
+# Harborlight already knows Delphine as "D. Arceneaux". The match points at her WebID; no second person.
+dcoord:match-harborlight a ucm:MatchClaim , core:Artifact ;
+    rdfs:label "Harborlight client record 'D. Arceneaux' is the Person identified by Delphine's WebID" ;
+    ucm:statementSubject dcoord:p-delphine ; ucm:madeWithinContext dlock:social-context ;
+    ucm:statementDate "2026-09-14T10:40:00Z"^^xsd:dateTime .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+rb:agent a core:Agent ; rdfs:label "Riverbend care transitions agent" ;
+    prov:actedOnBehalfOf :riverbend ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:riverbend.example:agents:care-transitions" ] .
+hl:agent a core:Agent ; rdfs:label "Harborlight intake agent" ;
+    prov:actedOnBehalfOf :harborlight ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:harborlight.example:agents:intake" ] .
+ng:agent a core:Agent ; rdfs:label "Northgate coordination agent" ;
+    prov:actedOnBehalfOf :northgate ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:northgate.example:agents:coordination" ] .
+
+##### Capabilities. cap:requiresPermission names the WAC access mode on Delphine's Pod. #####
+
+:capFormTeam a cap:Capability ; rdfs:label "Form and manage the care team" ;
+    cap:capabilityExpression "Write ucm:CoordinationRequest and team membership into the discharge-coordination holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Write" .
+:capAssertMatch a cap:Capability ; rdfs:label "Assert an identity match" ;
+    cap:capabilityExpression "Write a ucm:MatchClaim about Delphine's WebID" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Write" .
+:capHousingReferral a cap:Capability ; rdfs:label "Act on a housing referral" ;
+    cap:capabilityExpression "Append a ucm:Handshake; run ucm:HousingAssessment" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+:capShareSummary a cap:Capability ; rdfs:label "Share a care coordination summary" ;
+    cap:capabilityExpression "Append a ucm:Handshake or ucm:CareCoordinationStatement" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ;
+        cap:allowedContext "https://www.w3.org/ns/ucm#SocialCareContext" ;
+        cap:prohibitedContext "https://www.w3.org/ns/ucm#BehavioralHealthContext" ] .
+
+##### Intent and delegation #####
+
+:formTeamIntent a intent:Intent ; rdfs:label "Form a cross-domain care team for a safe discharge to stable housing" ;
+    intent:authorizedBy :d1 ;
+    intent:producesAction :actRequestHarborlight , :actRequestNorthgate , :actMatch .
+rb:agent core:hasIntent :formTeamIntent .
+
+:chain a del:DelegationChain ; del:hasDelegation :d1 , :d2 , :d3 .
+
+:d1 a del:Delegation ; del:delegationId "A-D1" ;
+    del:note "Delphine consents to Riverbend coordinating her discharge." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ; ext:consentRecord dcoordacl:riverbend ;
+    del:delegationScope [ a del:DelegationScope ;
+        del:allowedCapability :capFormTeam , :capAssertMatch , :capHousingReferral , :capShareSummary ;
+        del:intentConstraint :formTeamIntent ;
+        del:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ; del:validUntil "2026-10-14T09:00:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "A-D2" ;
+    del:note "Riverbend invites Harborlight. Delphine's locker agent writes the ACL rule, since only the Pod owner holds acl:Control." ;
+    del:delegatedBy rb:agent ; del:delegatesTo hl:agent ; ext:consentRecord dcoordacl:harborlight ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capHousingReferral ;
+        del:validFrom "2026-09-14T11:20:00Z"^^xsd:dateTime ; del:validUntil "2026-10-14T09:00:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "A-D3" ;
+    del:note "Riverbend invites Northgate, narrowed to summaries only, on Northgate's own terms." ;
+    del:delegatedBy rb:agent ; del:delegatesTo ng:agent ; ext:consentRecord dcoordacl:northgate ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capShareSummary ;
+        del:validFrom "2026-09-14T15:05:00Z"^^xsd:dateTime ; del:validUntil "2026-10-14T09:00:00Z"^^xsd:dateTime ] .
+
+##### Actions: HTTP requests against Delphine's Pod #####
+
+:actRequestHarborlight a core:Action ; rdfs:label "Write the coordination request to Harborlight" ; core:producesArtifact dcoord:request-harborlight .
+:actRequestNorthgate   a core:Action ; rdfs:label "Write the coordination request to Northgate" ;   core:producesArtifact dcoord:request-northgate .
+:actMatch              a core:Action ; rdfs:label "Write the identity match" ;                       core:producesArtifact dcoord:match-harborlight .
+:actAcceptHarborlight  a core:Action ; rdfs:label "Append Harborlight's acceptance" ;                core:producesArtifact dcoord:handshake-harborlight .
+:actAcceptNorthgate    a core:Action ; rdfs:label "Append Northgate's acceptance, on its terms" ;   core:producesArtifact dcoord:handshake-northgate .
+rb:agent core:executesAction :actRequestHarborlight , :actRequestNorthgate , :actMatch .
+hl:agent core:executesAction :actAcceptHarborlight .
+ng:agent core:executesAction :actAcceptNorthgate .
+
+:gate a core:ExecutionContext ; rdfs:label "Delphine's Pod server (JSS) enforcing Web Access Control" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, the delegation is live, and the delegation's ACL rule grants the actor the needed mode on a container holding the target." ] ;
+    sec:hasDataHandlingPolicy [ a sec:DataHandlingPolicy ; sec:encryptionRequired true ;
+        sec:policyURI "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#northgate-terms"^^xsd:anyURI ] .

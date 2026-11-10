@@ -1,0 +1,63 @@
+# Case-specific shapes for use case C. The four generic checks are in ../shared/four-checks.shacl.ttl.
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix c:    <https://example.org/sac/hhs/coordinator-handoff/shapes#> .
+
+c: sh:declare
+    [ sh:prefix "del" ;    sh:namespace "https://w3id.org/agent-ontology/delegation#"^^xsd:anyURI ] ,
+    [ sh:prefix "ledger" ; sh:namespace "https://w3id.org/agent-ontology/ledger#"^^xsd:anyURI ] ,
+    [ sh:prefix "ucm" ;    sh:namespace "https://www.w3.org/ns/ucm#"^^xsd:anyURI ] ,
+    [ sh:prefix "ext" ;    sh:namespace "https://example.org/sac-ucm-ext#"^^xsd:anyURI ] ,
+    [ sh:prefix "prov" ;   sh:namespace "http://www.w3.org/ns/prov#"^^xsd:anyURI ] ,
+    [ sh:prefix "acl" ;    sh:namespace "http://www.w3.org/ns/auth/acl#"^^xsd:anyURI ] ,
+    [ sh:prefix "dcterms" ; sh:namespace "http://purl.org/dc/terms/"^^xsd:anyURI ] ,
+    [ sh:prefix "hev" ;    sh:namespace "http://w3id.org/holon/event/"^^xsd:anyURI ] .
+
+c:RoleMatchesDelegationShape a sh:NodeShape ;
+    sh:targetSubjectsOf ext:realizesParticipation ;
+    sh:sparql [
+        sh:message "The role participation and the delegation that realizes it must start together." ;
+        sh:prefixes c: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ext:realizesParticipation ?value ; del:delegationScope/del:validFrom ?a .
+                ?value ucm:validFrom ?b . FILTER (?a != ?b)
+            }""" ] ;
+    sh:sparql [
+        sh:message "If the role participation has ended, the delegation must have been revoked at the same moment." ;
+        sh:prefixes c: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ext:realizesParticipation ?value . ?value ucm:validTo ?end .
+                FILTER NOT EXISTS { ?r ledger:delegation $this ; ledger:governanceAction ext:Revoke ; ledger:timestamp ?end }
+            }""" ] .
+
+c:NoCoordinatorGapShape a sh:NodeShape ;
+    sh:targetClass ucm:CoordinatorRole ;
+    sh:sparql [
+        sh:message "Coordination gap: a coordinator participation ended and no other began at that moment." ;
+        sh:prefixes c: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                ?value ucm:assumesRole $this ; ucm:validTo ?end .
+                FILTER NOT EXISTS { ?next ucm:assumesRole $this ; ucm:validFrom ?end . FILTER (?next != ?value) }
+            }""" ] ;
+    sh:sparql [
+        sh:message "Two coordinators at once: coordinator participations overlap." ;
+        sh:prefixes c: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                ?value ucm:assumesRole $this ; ucm:validFrom ?s1 . ?other ucm:assumesRole $this ; ucm:validFrom ?s2 .
+                FILTER (?value != ?other && ?s1 < ?s2)
+                OPTIONAL { ?value ucm:validTo ?e1 }
+                FILTER (!BOUND(?e1) || ?e1 > ?s2)
+            }""" ] .
+
+c:PeopleUnchangedShape a sh:NodeShape ;
+    sh:targetClass ucm:Person ;
+    sh:property [ sh:path ucm:participatesThrough ; sh:message "Roles live on participations, never on the Person." ] ;
+    sh:property [ sh:path ucm:assumesRole ; sh:maxCount 0 ] .

@@ -1,0 +1,1055 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://pod.example/arceneaux-household/profile/card.jsonld#us",
+      "@type": "ucm:Household",
+      "rdfs:label": "Delphine and Jules's grocery unit",
+      "ucm:definedByCriteria": {
+        "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#buys-together"
+      },
+      "ucm:hasMember": [
+        {
+          "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+        },
+        {
+          "@id": "https://pod.example/jules/profile/card.jsonld#me"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e05",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 5,
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d3"
+      },
+      "ledger:eventId": "BLR-005",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:fa6305ce8b238b712801421fbd0b91ec843563e77682e1ea0799aa9af2adb3cc",
+      "ledger:previousEventHash": "sha256:7bff5f6021fc8dab361ce579aaf1a87f6b70a04236c24d84bcea2ef5cb540904",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-fa6305ce8b23",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:00:00+00:00"
+      },
+      "rdfs:label": "FreshPlate granted to the household"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#m-delphine",
+      "@type": "ucm:Membership",
+      "ucm:membershipIn": {
+        "@id": "https://pod.example/arceneaux-household/profile/card.jsonld#us"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup1",
+      "@type": "core:Action",
+      "rdfs:label": "Jules picks up a FreshPlate box"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#determination",
+      "@type": "ucm:EligibilityDetermination",
+      "rdfs:label": "FreshPlate eligibility determination"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capDetermine",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Append a ucm:SocialCareStatement under :fresh-plate-rules",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Append",
+      "rdfs:label": "Record a FreshPlate eligibility result"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#benefit-1",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#beneficiary-role"
+      },
+      "ucm:hasCareTrajectoryContext": [
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#after-recert-due"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#before-noticed"
+        }
+      ],
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:00:00+00:00"
+      },
+      "ucm:validTo": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-04-30T00:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e08",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 8,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actRecertNotice"
+      },
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d1"
+      },
+      "ledger:eventId": "BLR-008",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:fcc8958e4cb34200ed3b749a11a5181c969a5cffea54d0d3c9b4ae7bae6ca194",
+      "ledger:previousEventHash": "sha256:3368d91e73d7b74b9a0de4f8a403aab1c2e5f6244cdcd6c64a7112ac908c58fa",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-fcc8958e4cb3",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-04-01T09:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capNotify"
+      },
+      "rdfs:label": "Recertification notice sent to the old address"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#m-jules",
+      "@type": "ucm:Membership",
+      "ucm:membershipIn": {
+        "@id": "https://pod.example/arceneaux-household/profile/card.jsonld#us"
+      }
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e07",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 7,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup1"
+      },
+      "ledger:actor": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d4"
+      },
+      "ledger:eventId": "BLR-007",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:3368d91e73d7b74b9a0de4f8a403aab1c2e5f6244cdcd6c64a7112ac908c58fa",
+      "ledger:previousEventHash": "sha256:05f50da51a4b7846e37a7d6e7881911129f496fc3b936d6b7c05f34f56e11465",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:jules#key-1",
+      "ledger:signature": "placeholder-signature-3368d91e73d7",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-24T17:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capRedeem"
+      },
+      "rdfs:label": "First Tuesday pickup"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#fresh-plate",
+      "@type": "ucm:ProgramDefinition",
+      "rdfs:label": "FreshPlate Food Benefit (fictional)"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e04",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 4,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actDetermine"
+      },
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d1"
+      },
+      "ledger:eventId": "BLR-004",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:7bff5f6021fc8dab361ce579aaf1a87f6b70a04236c24d84bcea2ef5cb540904",
+      "ledger:previousEventHash": "sha256:ab699691921f293e8117fcf15a7cdbfade845eceb7c779d62fc3f59af03f8deb",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-7bff5f6021fc",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capDetermine"
+      },
+      "rdfs:label": "Eligibility result appended to Delphine's Pod"
+    },
+    {
+      "@id": "https://pod.example/jules/holon/income/boundary.jsonld#holon",
+      "@type": "holon:DataHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Jules's income"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e13",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 13,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup2"
+      },
+      "ledger:actor": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d4"
+      },
+      "ledger:eventId": "BLR-013",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:2e95a381d69d068407e2d06fe277b6ff7b34594266220dd6e822333fd672a8be",
+      "ledger:previousEventHash": "sha256:2ee39b8b06106a7ecde4987792df39869d15edc1fbc7631d5f28e7b07ada0d61",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:jules#key-1",
+      "ledger:signature": "placeholder-signature-2e95a381d69d",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-05-25T17:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capRedeem"
+      },
+      "rdfs:label": "Pickups resume"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d4",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegationId": "D-D4",
+      "del:delegationScope": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b9"
+      },
+      "del:note": "The household lets Jules, the caregiver, pick up the box."
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b9",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capRedeem"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:05:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d3",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegationId": "D-D3",
+      "del:delegationScope": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b8"
+      },
+      "del:note": "The county grants FreshPlate to the household.",
+      "ext:realizesParticipation": [
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#benefit-1"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#benefit-2"
+        }
+      ]
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b8",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capRedeem"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#beneficiary-role",
+      "@type": "ucm:BeneficiaryRole"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e09",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 9,
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d3"
+      },
+      "ledger:eventId": "BLR-009",
+      "ledger:governanceAction": {
+        "@id": "ext:Suspend"
+      },
+      "ledger:hash": "sha256:06340d9a5726186e4f679767c9c7edcc846e9d62bb2112fdd630d51d5a48a732",
+      "ledger:previousEventHash": "sha256:fcc8958e4cb34200ed3b749a11a5181c969a5cffea54d0d3c9b4ae7bae6ca194",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-06340d9a5726",
+      "rdfs:label": "Benefit suspended for missed recertification (exact day unknown)"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b1"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "rdfs:label": "Delphine's locker agent"
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b1",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:pod.example:delphine"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capRedeem",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Pick up a FreshPlate box at the pantry",
+      "rdfs:label": "Redeem FreshPlate benefit"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e11",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 11,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actReadWages2"
+      },
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d2"
+      },
+      "ledger:eventId": "BLR-011",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:4914b912a8b81975100a7af143d4c756c42ad0b83da3a935ef3e6315431ea337",
+      "ledger:previousEventHash": "sha256:7a1ac7d19dc29298ff23ac2a785e2536777c0636dd75fb887b85c5d52177e340",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-4914b912a8b8",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-05-21T09:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capReadIncome"
+      },
+      "rdfs:label": "County reads Jules's new pay stubs from his Pod"
+    },
+    {
+      "@id": "https://pod.example/jules/holon/income/event.jsonld#wages",
+      "@type": [
+        "ucm:SocialCareStatement",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Household income: Jules's warehouse wages (pay stubs)",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-12T10:00:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/jules/holon/income/event.jsonld#p-client"
+      }
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#buys-together",
+      "@type": "ucm:MembershipCriteria",
+      "rdfs:label": "Buy and prepare food together"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d2",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "del:delegationId": "D-D2",
+      "del:delegationScope": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b7"
+      },
+      "del:note": "Jules consents to the county reading his wages. He counts as household, not as a patient.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/jules/holon/income/.acl#county"
+      }
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b7",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capReadIncome"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-10T09:05:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#consentJules",
+      "@type": "del:DelegationChain",
+      "del:hasDelegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d2"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#after-recert-due",
+      "@type": "ucm:CareTrajectoryContext",
+      "rdfs:label": "After the recertification due date"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate",
+      "@type": "core:ExecutionContext",
+      "rdfs:label": "Authorization gate: the county benefit system, and the Pod servers for Pod data",
+      "sec:hasAccessControlRule": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b10"
+      }
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b10",
+      "@type": "sec:AccessControlRule",
+      "sec:allowedAction": "Admit only if the actor is the delegate, the capability is in scope, no delegation on its path is revoked or suspended, and, for Pod data, an ACL rule grants the mode."
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e02",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 2,
+      "ledger:actor": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d2"
+      },
+      "ledger:eventId": "BLR-002",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:9055c26f8224148c38aa1b3fc45b140f3b196c09d49f5347a704d92da968699f",
+      "ledger:previousEventHash": "sha256:6c11fc13b2a5ffe1c5284f80a640e40ccfe125e4434e795be94979b5fb20ac39",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:jules#key-1",
+      "ledger:signature": "placeholder-signature-9055c26f8224",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-10T09:05:00+00:00"
+      },
+      "rdfs:label": "Jules consents: rule for the county added to income/.acl"
+    },
+    {
+      "@id": "https://pod.example/delphine/profile/card.jsonld#me",
+      "@type": "ucm:Person",
+      "rdfs:label": "Delphine Arceneaux",
+      "ucm:hasMembership": {
+        "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#m-delphine"
+      },
+      "ucm:participatesThrough": [
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#p-client"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#benefit-1"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#benefit-2"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#locker-agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b3"
+      },
+      "core:hasIntent": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#steadyMealsIntent"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://pod.example/arceneaux-household/profile/card.jsonld#us"
+      },
+      "rdfs:label": "Household locker agent"
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b3",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:pod.example:arceneaux-household"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actDetermine",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#eligible"
+      },
+      "rdfs:label": "County appends the eligibility result to Delphine's Pod"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#before-noticed",
+      "@type": "ucm:CareTrajectoryContext",
+      "rdfs:label": "Before the coordinator notices the suspension"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e12",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 12,
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d3"
+      },
+      "ledger:eventId": "BLR-012",
+      "ledger:governanceAction": {
+        "@id": "ext:Reinstate"
+      },
+      "ledger:hash": "sha256:2ee39b8b06106a7ecde4987792df39869d15edc1fbc7631d5f28e7b07ada0d61",
+      "ledger:previousEventHash": "sha256:4914b912a8b81975100a7af143d4c756c42ad0b83da3a935ef3e6315431ea337",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-2ee39b8b0610",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-05-21T10:00:00+00:00"
+      },
+      "rdfs:label": "Benefit reinstated"
+    },
+    {
+      "@id": "https://pod.example/jules/holon/income/.acl#county",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/jules/holon/income/"
+      },
+      "acl:agent": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/jules/holon/income/"
+      },
+      "acl:mode": {
+        "@id": "acl:Read"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#steadyMealsIntent",
+      "@type": "intent:Intent",
+      "intent:authorizedBy": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d3"
+      },
+      "intent:producesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup1"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickupLapsed"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup2"
+        }
+      ],
+      "rdfs:label": "Keep the household's food benefit continuous"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup2",
+      "@type": "core:Action",
+      "rdfs:label": "Jules picks up a box after reinstatement"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/.acl#county",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/benefits/"
+      },
+      "acl:agent": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/benefits/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d1",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "del:delegationId": "D-D1",
+      "del:delegationScope": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b6"
+      },
+      "del:note": "Delphine consents to the county reading her benefits holon and appending the result.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/benefits/.acl#county"
+      }
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b6",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": [
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capReadIncome"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capDetermine"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capNotify"
+        }
+      ],
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-10T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon",
+      "@type": "holon:AgentHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "holon:contains": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's personal data locker"
+    },
+    {
+      "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b2"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup1"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickupLapsed"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickup2"
+        }
+      ],
+      "prov:actedOnBehalfOf": {
+        "@id": "https://pod.example/jules/profile/card.jsonld#me"
+      },
+      "rdfs:label": "Jules's locker agent"
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b2",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:pod.example:jules"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#client-role",
+      "@type": "ucm:ClientRole"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#eligible",
+      "@type": [
+        "ucm:SocialCareStatement",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Household is eligible for FreshPlate",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:00:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#p-client"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context",
+      "@type": "ucm:SocialCareContext",
+      "ucm:definedByArtifact": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#fresh-plate-rules"
+      }
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e03",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 3,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actReadWages"
+      },
+      "ledger:actor": {
+        "@id": "https://bramble-county.example/agents/benefits#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d2"
+      },
+      "ledger:eventId": "BLR-003",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:ab699691921f293e8117fcf15a7cdbfade845eceb7c779d62fc3f59af03f8deb",
+      "ledger:previousEventHash": "sha256:9055c26f8224148c38aa1b3fc45b140f3b196c09d49f5347a704d92da968699f",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:bramble-county.example:agents:benefits#key-1",
+      "ledger:signature": "placeholder-signature-ab699691921f",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-12T10:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capReadIncome"
+      },
+      "rdfs:label": "County reads Jules's wages from his Pod"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#fresh-plate-rules",
+      "@type": "ucm:EligibilityRuleset",
+      "rdfs:label": "FreshPlate eligibility rules. The income limit lives in the implementation model, not here."
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#benefit-2",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#beneficiary-role"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-05-21T10:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickupLapsed",
+      "@type": "core:Action",
+      "rdfs:label": "Jules tries to pick up a box during the lapse"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actReadWages2",
+      "@type": "core:Action",
+      "prov:used": {
+        "@id": "https://pod.example/jules/holon/income/event.jsonld#wages"
+      },
+      "rdfs:label": "County reads Jules's new pay stubs from his Pod"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capNotify",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Send recertification and other notices by mail",
+      "rdfs:label": "Send program notices"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#holon",
+      "@type": "holon:AgentHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/arceneaux-household/profile/card.jsonld#us"
+      },
+      "rdfs:label": "Household data locker"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e01",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 1,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d1"
+      },
+      "ledger:eventId": "BLR-001",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:6c11fc13b2a5ffe1c5284f80a640e40ccfe125e4434e795be94979b5fb20ac39",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-6c11fc13b2a5",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-10T09:00:00+00:00"
+      },
+      "rdfs:label": "Delphine consents: rule for the county added to benefits/.acl"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e10",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "deny",
+      "hev:eventSequence": 10,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actPickupLapsed"
+      },
+      "ledger:actor": {
+        "@id": "https://pod.example/jules/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d4"
+      },
+      "ledger:eventId": "BLR-010",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#gate"
+      },
+      "ledger:hash": "sha256:7a1ac7d19dc29298ff23ac2a785e2536777c0636dd75fb887b85c5d52177e340",
+      "ledger:previousEventHash": "sha256:06340d9a5726186e4f679767c9c7edcc846e9d62bb2112fdd630d51d5a48a732",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:jules#key-1",
+      "ledger:signature": "placeholder-signature-7a1ac7d19dc2",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2027-05-18T17:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capRedeem"
+      },
+      "rdfs:label": "Denied: the household's benefit is suspended"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#capReadIncome",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "GET ucm:SocialCareStatement about household income",
+      "cap:hasConstraint": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b5"
+      },
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Read",
+      "rdfs:label": "Read household income statements"
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b5",
+      "@type": "cap:CapabilityConstraint",
+      "cap:allowedContext": "https://www.w3.org/ns/ucm#SocialCareContext"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#p-client",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#client-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#determination"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#consentDelphine",
+      "@type": "del:DelegationChain",
+      "del:hasDelegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d1"
+      }
+    },
+    {
+      "@id": "https://pod.example/jules/holon/income/event.jsonld#p-client",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#client-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/benefits/event.jsonld#determination"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#social-context"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#benefitChain",
+      "@type": "del:DelegationChain",
+      "del:hasDelegation": [
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d3"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d4"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/jules/holon/boundary.jsonld#holon",
+      "@type": "holon:AgentHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/jules/profile/card.jsonld#me"
+      },
+      "holon:contains": {
+        "@id": "https://pod.example/jules/holon/income/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Jules's personal data locker"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actRecertNotice",
+      "@type": "core:Action",
+      "rdfs:label": "County sends a recertification notice (to the old address)"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actReadWages",
+      "@type": "core:Action",
+      "prov:used": {
+        "@id": "https://pod.example/jules/holon/income/event.jsonld#wages"
+      },
+      "rdfs:label": "County reads Jules's wages from his Pod"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#county",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Bramble County Department of Human Services"
+    },
+    {
+      "@id": "https://bramble-county.example/agents/benefits#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nc3e56282a7c04877bae232ad7620faf4b4"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actReadWages"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actDetermine"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actRecertNotice"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#actReadWages2"
+        }
+      ],
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#county"
+      },
+      "rdfs:label": "Bramble County DHS benefits agent"
+    },
+    {
+      "@id": "_:nc3e56282a7c04877bae232ad7620faf4b4",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:bramble-county.example:agents:benefits"
+    },
+    {
+      "@id": "https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#e06",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 6,
+      "ledger:actor": {
+        "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement#d4"
+      },
+      "ledger:eventId": "BLR-006",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:05f50da51a4b7846e37a7d6e7881911129f496fc3b936d6b7c05f34f56e11465",
+      "ledger:previousEventHash": "sha256:fa6305ce8b238b712801421fbd0b91ec843563e77682e1ea0799aa9af2adb3cc",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:arceneaux-household#key-1",
+      "ledger:signature": "placeholder-signature-05f50da51a4b",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-11-17T10:05:00+00:00"
+      },
+      "rdfs:label": "Jules may pick up for the household"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/benefits/boundary.jsonld#holon",
+      "@type": "holon:ProcessHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's food benefit"
+    },
+    {
+      "@id": "https://pod.example/jules/profile/card.jsonld#me",
+      "@type": "ucm:Person",
+      "rdfs:label": "Jules Arceneaux",
+      "ucm:hasMembership": {
+        "@id": "https://pod.example/arceneaux-household/holon/boundary.jsonld#m-jules"
+      },
+      "ucm:participatesThrough": {
+        "@id": "https://pod.example/jules/holon/income/event.jsonld#p-client"
+      }
+    }
+  ]
+}

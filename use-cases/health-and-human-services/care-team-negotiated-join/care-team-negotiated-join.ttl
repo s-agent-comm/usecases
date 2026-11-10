@@ -1,0 +1,270 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix agent: <https://w3id.org/agent-ontology/agent#> .
+@prefix id:   <https://w3id.org/agent-ontology/identity#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix cap:  <https://w3id.org/agent-ontology/capability#> .
+@prefix intent: <https://w3id.org/agent-ontology/intent#> .
+@prefix ledger: <https://w3id.org/agent-ontology/ledger#> .
+@prefix sec:  <https://w3id.org/agent-ontology/security-binding#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix acl:  <http://www.w3.org/ns/auth/acl#> .
+@prefix holon: <http://w3id.org/holon/> .
+@prefix hev:  <http://w3id.org/holon/event/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix : <https://example.org/sac/hhs/care-team-negotiated-join#> .
+
+# Use case A. Joining a care team by agreement.
+# Source: UCM discharge story, steps 2 to 6. All people and organizations are fictional.
+#
+# Delphine's data and consent live in her Solid Pod, laid out as in personal-data-locker:
+# her WebID is her ucm:Person, her care data sits in holon containers (each with scene,
+# boundary, event and projection graphs), and consent is a Web Access Control rule in a
+# container's .acl. https://pod.example/ stands for a JSS server. Hashes are real;
+# signatures are placeholders.
+
+@prefix dme:     <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:   <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dcoordb: <https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#> .
+@prefix dcoord:  <https://pod.example/delphine/holon/discharge-coordination/event.jsonld#> .
+@prefix dcoordacl: <https://pod.example/delphine/holon/discharge-coordination/.acl#> .
+@prefix log:     <https://pod.example/delphine/holon/access-log/event.jsonld#> .
+@prefix rb:      <https://riverbend.example/agents/care-transitions#> .
+@prefix hl:      <https://harborlight.example/agents/intake#> .
+@prefix ng:      <https://northgate.example/agents/coordination#> .
+
+##### Solid Pod: Delphine's personal data locker #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" ;
+    ucm:participatesThrough dcoord:p-delphine ; ucm:hasMembership dcoord:m-delphine .
+
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ;
+    dcterms:subject dme:me ; holon:contains dcoordb:holon .
+dcoordb:holon a holon:ProcessHolon ; rdfs:label "Delphine's discharge coordination" ;
+    holon:partOf dlock:holon ; dcterms:subject dcoord:coordination .
+
+# Consent: the rules in discharge-coordination/.acl, written by Delphine's locker agent.
+# Each one is the consent record of a delegation below.
+dcoordacl:owner a acl:Authorization ; acl:agent dme:me ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Control .
+dcoordacl:riverbend a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Append .
+dcoordacl:harborlight a acl:Authorization ; acl:agent hl:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+dcoordacl:northgate a acl:Authorization ; acl:agent ng:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append ;
+    dcterms:conformsTo dcoordb:northgate-terms .
+
+##### UCM content, stored in the discharge-coordination holon #####
+
+:tomasz a ucm:Person ; rdfs:label "Tomasz Brennan" ; ucm:affiliatedWith :riverbend ; ucm:hasMembership dcoord:m-tomasz .
+:amara  a ucm:Person ; rdfs:label "Amara Lindqvist" ; ucm:affiliatedWith :harborlight ; ucm:hasMembership dcoord:m-amara .
+:priya  a ucm:Person ; rdfs:label "Priya Castellanos" ; ucm:affiliatedWith :northgate ; ucm:hasMembership dcoord:m-priya .
+
+:riverbend   a ucm:Organization ; rdfs:label "Riverbend General Hospital" .
+:harborlight a ucm:Organization ; rdfs:label "Harborlight Housing Collaborative" ;
+    ucm:participatesThrough dcoord:p-harborlight ; ucm:acceptsRequest dcoord:p-harborlight .
+:northgate   a ucm:Organization ; rdfs:label "Northgate Community Mental Health" ;
+    ucm:participatesThrough dcoord:p-northgate ; ucm:acceptsRequest dcoord:p-northgate .
+
+dlock:social-context a ucm:SocialCareContext ; rdfs:label "Delphine's social care" .
+dcoordb:behavioral-context a ucm:BehavioralHealthContext ; ucm:definedByArtifact dcoordb:northgate-terms .
+dcoordb:northgate-terms a ucm:PolicyDefinition ;
+    rdfs:label "Northgate terms: share a coordination summary only; therapy notes stay in the Behavioral Health context" .
+dcoordb:safe-discharge a ucm:ActivityFocus ; rdfs:label "Safe discharge to stable housing" .
+dcoordb:beneficiary-role a ucm:BeneficiaryRole .
+dcoordb:provider-role    a ucm:ProviderRole .
+
+dcoord:coordination a ucm:CareCoordinationInteraction ;
+    rdfs:label "Discharge coordination for Delphine" ;
+    ucm:hasActivityFocus dcoordb:safe-discharge ; ucm:hasLifecycleState ucm:Accepted .
+dcoord:p-delphine a ucm:Participation ; ucm:assumesRole dcoordb:beneficiary-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dlock:social-context .
+
+dcoord:care-team a ucm:CareTeam ; rdfs:label "Delphine's care team" ;
+    ucm:hasMember dme:me , :tomasz , :amara , :priya ; ucm:definedByCriteria dcoordb:team-criteria .
+dcoordb:team-criteria a ucm:MembershipCriteria ; rdfs:label "Consent on file in Delphine's Pod and an accepted handshake" .
+dcoord:m-delphine a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime .
+dcoord:m-tomasz   a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime .
+dcoord:m-amara    a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T11:20:00Z"^^xsd:dateTime .
+dcoord:m-priya    a ucm:Membership ; ucm:membershipIn dcoord:care-team ; ucm:validFrom "2026-09-14T15:05:00Z"^^xsd:dateTime .
+
+dcoord:request-harborlight a ucm:CoordinationRequest , core:Artifact ; rdfs:label "Request: housing navigation" .
+dcoord:request-northgate   a ucm:CoordinationRequest , core:Artifact ; rdfs:label "Request: behavioral health coordination" .
+dcoord:handshake-harborlight a ucm:Handshake , core:Artifact ;
+    ucm:negotiates dcoord:coordination ; ucm:hasLifecycleState ucm:Accepted .
+dcoord:handshake-northgate   a ucm:Handshake , core:Artifact ;
+    ucm:negotiates dcoord:coordination ; ucm:hasLifecycleState ucm:Accepted .
+dcoord:p-harborlight a ucm:Participation ; ucm:assumesRole dcoordb:provider-role ;
+    ucm:occursWithin dcoord:handshake-harborlight ; ucm:scopedBy dlock:social-context .
+dcoord:p-northgate   a ucm:Participation ; ucm:assumesRole dcoordb:provider-role ;
+    ucm:occursWithin dcoord:handshake-northgate ; ucm:scopedBy dcoordb:behavioral-context .
+
+# Harborlight already knows Delphine as "D. Arceneaux". The match points at her WebID; no second person.
+dcoord:match-harborlight a ucm:MatchClaim , core:Artifact ;
+    rdfs:label "Harborlight client record 'D. Arceneaux' is the Person identified by Delphine's WebID" ;
+    ucm:statementSubject dcoord:p-delphine ; ucm:madeWithinContext dlock:social-context ;
+    ucm:statementDate "2026-09-14T10:40:00Z"^^xsd:dateTime .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+rb:agent a core:Agent ; rdfs:label "Riverbend care transitions agent" ;
+    prov:actedOnBehalfOf :riverbend ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:riverbend.example:agents:care-transitions" ] .
+hl:agent a core:Agent ; rdfs:label "Harborlight intake agent" ;
+    prov:actedOnBehalfOf :harborlight ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:harborlight.example:agents:intake" ] .
+ng:agent a core:Agent ; rdfs:label "Northgate coordination agent" ;
+    prov:actedOnBehalfOf :northgate ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:northgate.example:agents:coordination" ] .
+
+##### Capabilities. cap:requiresPermission names the WAC access mode on Delphine's Pod. #####
+
+:capFormTeam a cap:Capability ; rdfs:label "Form and manage the care team" ;
+    cap:capabilityExpression "Write ucm:CoordinationRequest and team membership into the discharge-coordination holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Write" .
+:capAssertMatch a cap:Capability ; rdfs:label "Assert an identity match" ;
+    cap:capabilityExpression "Write a ucm:MatchClaim about Delphine's WebID" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Write" .
+:capHousingReferral a cap:Capability ; rdfs:label "Act on a housing referral" ;
+    cap:capabilityExpression "Append a ucm:Handshake; run ucm:HousingAssessment" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+:capShareSummary a cap:Capability ; rdfs:label "Share a care coordination summary" ;
+    cap:capabilityExpression "Append a ucm:Handshake or ucm:CareCoordinationStatement" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ;
+        cap:allowedContext "https://www.w3.org/ns/ucm#SocialCareContext" ;
+        cap:prohibitedContext "https://www.w3.org/ns/ucm#BehavioralHealthContext" ] .
+
+##### Intent and delegation #####
+
+:formTeamIntent a intent:Intent ; rdfs:label "Form a cross-domain care team for a safe discharge to stable housing" ;
+    intent:authorizedBy :d1 ;
+    intent:producesAction :actRequestHarborlight , :actRequestNorthgate , :actMatch .
+rb:agent core:hasIntent :formTeamIntent .
+
+:chain a del:DelegationChain ; del:hasDelegation :d1 , :d2 , :d3 .
+
+:d1 a del:Delegation ; del:delegationId "A-D1" ;
+    del:note "Delphine consents to Riverbend coordinating her discharge." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ; ext:consentRecord dcoordacl:riverbend ;
+    del:delegationScope [ a del:DelegationScope ;
+        del:allowedCapability :capFormTeam , :capAssertMatch , :capHousingReferral , :capShareSummary ;
+        del:intentConstraint :formTeamIntent ;
+        del:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ; del:validUntil "2026-10-14T09:00:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "A-D2" ;
+    del:note "Riverbend invites Harborlight. Delphine's locker agent writes the ACL rule, since only the Pod owner holds acl:Control." ;
+    del:delegatedBy rb:agent ; del:delegatesTo hl:agent ; ext:consentRecord dcoordacl:harborlight ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capHousingReferral ;
+        del:validFrom "2026-09-14T11:20:00Z"^^xsd:dateTime ; del:validUntil "2026-10-14T09:00:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "A-D3" ;
+    del:note "Riverbend invites Northgate, narrowed to summaries only, on Northgate's own terms." ;
+    del:delegatedBy rb:agent ; del:delegatesTo ng:agent ; ext:consentRecord dcoordacl:northgate ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capShareSummary ;
+        del:validFrom "2026-09-14T15:05:00Z"^^xsd:dateTime ; del:validUntil "2026-10-14T09:00:00Z"^^xsd:dateTime ] .
+
+##### Actions: HTTP requests against Delphine's Pod #####
+
+:actRequestHarborlight a core:Action ; rdfs:label "Write the coordination request to Harborlight" ; core:producesArtifact dcoord:request-harborlight .
+:actRequestNorthgate   a core:Action ; rdfs:label "Write the coordination request to Northgate" ;   core:producesArtifact dcoord:request-northgate .
+:actMatch              a core:Action ; rdfs:label "Write the identity match" ;                       core:producesArtifact dcoord:match-harborlight .
+:actAcceptHarborlight  a core:Action ; rdfs:label "Append Harborlight's acceptance" ;                core:producesArtifact dcoord:handshake-harborlight .
+:actAcceptNorthgate    a core:Action ; rdfs:label "Append Northgate's acceptance, on its terms" ;   core:producesArtifact dcoord:handshake-northgate .
+rb:agent core:executesAction :actRequestHarborlight , :actRequestNorthgate , :actMatch .
+hl:agent core:executesAction :actAcceptHarborlight .
+ng:agent core:executesAction :actAcceptNorthgate .
+
+:gate a core:ExecutionContext ; rdfs:label "Delphine's Pod server (JSS) enforcing Web Access Control" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, the delegation is live, and the delegation's ACL rule grants the actor the needed mode on a container holding the target." ] ;
+    sec:hasDataHandlingPolicy [ a sec:DataHandlingPolicy ; sec:encryptionRequired true ;
+        sec:policyURI "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#northgate-terms"^^xsd:anyURI ] .
+
+##### Execution record: append-only, hash-chained, signed #####
+
+log:e01 a ledger:GovernanceLedgerEvent ; rdfs:label "Delphine consents to Riverbend coordinating her discharge" ;
+    ledger:eventId "CTNJ-001" ; hev:eventSequence 1 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d1 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:hash "sha256:04ca3ca0213ddcb61b9d483db2a1362691ae89dd22bbbedf9ed7ed7ea2cea1c2" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-04ca3ca0213d" .
+log:e02 a ledger:RuntimeLedgerEvent ; rdfs:label "MatchClaim: Harborlight's record is Delphine's WebID" ;
+    ledger:eventId "CTNJ-002" ; hev:eventSequence 2 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T10:40:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capAssertMatch ; ledger:action :actMatch ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:04ca3ca0213ddcb61b9d483db2a1362691ae89dd22bbbedf9ed7ed7ea2cea1c2" ;
+    ledger:hash "sha256:99e0720abfa9ab51b8916e0ba28c2bfe5abc6dcbbdd13e9b4aff5aa0c36ac213" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-99e0720abfa9" .
+log:e03 a ledger:RuntimeLedgerEvent ; rdfs:label "CoordinationRequest written for Harborlight" ;
+    ledger:eventId "CTNJ-003" ; hev:eventSequence 3 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T10:45:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capFormTeam ; ledger:action :actRequestHarborlight ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:99e0720abfa9ab51b8916e0ba28c2bfe5abc6dcbbdd13e9b4aff5aa0c36ac213" ;
+    ledger:hash "sha256:93d23c25aa222c5ea753fc1f6ea1ac5799f01905dbedd495a462bd28b9c24f93" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-93d23c25aa22" .
+log:e04 a ledger:RuntimeLedgerEvent ; rdfs:label "CoordinationRequest written for Northgate" ;
+    ledger:eventId "CTNJ-004" ; hev:eventSequence 4 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T10:46:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capFormTeam ; ledger:action :actRequestNorthgate ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:93d23c25aa222c5ea753fc1f6ea1ac5799f01905dbedd495a462bd28b9c24f93" ;
+    ledger:hash "sha256:23b601beecdbc8ca83c6d5581192a837f52fcc51c88295b7082c99631d9b7e98" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-23b601beecdb" .
+log:e05 a ledger:GovernanceLedgerEvent ; rdfs:label "Sub-delegation offered to Harborlight" ;
+    ledger:eventId "CTNJ-005" ; hev:eventSequence 5 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T10:47:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:23b601beecdbc8ca83c6d5581192a837f52fcc51c88295b7082c99631d9b7e98" ;
+    ledger:hash "sha256:1d4512f6d77ae208e09a9b48689f7dcaed0fa155a88a6c0484133631164e8347" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-1d4512f6d77a" .
+log:e06 a ledger:GovernanceLedgerEvent ; rdfs:label "Sub-delegation offered to Northgate, summaries only" ;
+    ledger:eventId "CTNJ-006" ; hev:eventSequence 6 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T10:48:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d3 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:1d4512f6d77ae208e09a9b48689f7dcaed0fa155a88a6c0484133631164e8347" ;
+    ledger:hash "sha256:f1db5f51890183f482798401a9c1e628202e4d28d43b3fcbd9505aca6dbe413b" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-f1db5f518901" .
+log:e07 a ledger:RuntimeLedgerEvent ; rdfs:label "Handshake accepted as is" ;
+    ledger:eventId "CTNJ-007" ; hev:eventSequence 7 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T11:20:00Z"^^xsd:dateTime ;
+    ledger:actor hl:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capHousingReferral ; ledger:action :actAcceptHarborlight ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:f1db5f51890183f482798401a9c1e628202e4d28d43b3fcbd9505aca6dbe413b" ;
+    ledger:hash "sha256:7909277159aad5c38a668f8c2cc3466ec8705d94daf94c010307fe3981b84bf1" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:harborlight.example:agents:intake#key-1" ;
+    ledger:signature "placeholder-signature-7909277159aa" .
+log:e08 a ledger:RuntimeLedgerEvent ; rdfs:label "Handshake accepted on Northgate's terms" ;
+    ledger:eventId "CTNJ-008" ; hev:eventSequence 8 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T15:05:00Z"^^xsd:dateTime ;
+    ledger:actor ng:agent ; ledger:delegation :d3 ;
+    ledger:usesCapability :capShareSummary ; ledger:action :actAcceptNorthgate ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:7909277159aad5c38a668f8c2cc3466ec8705d94daf94c010307fe3981b84bf1" ;
+    ledger:hash "sha256:d8727db2c5bab149feb3f4b7fe3ef38479f5b71a8c254f28345f28cb03c22ffe" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:northgate.example:agents:coordination#key-1" ;
+    ledger:signature "placeholder-signature-d8727db2c5ba" .

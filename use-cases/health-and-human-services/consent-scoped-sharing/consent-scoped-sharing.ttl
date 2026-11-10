@@ -1,0 +1,301 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix agent: <https://w3id.org/agent-ontology/agent#> .
+@prefix id:   <https://w3id.org/agent-ontology/identity#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix cap:  <https://w3id.org/agent-ontology/capability#> .
+@prefix intent: <https://w3id.org/agent-ontology/intent#> .
+@prefix ledger: <https://w3id.org/agent-ontology/ledger#> .
+@prefix sec:  <https://w3id.org/agent-ontology/security-binding#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix acl:  <http://www.w3.org/ns/auth/acl#> .
+@prefix holon: <http://w3id.org/holon/> .
+@prefix hev:  <http://w3id.org/holon/event/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix : <https://example.org/sac/hhs/consent-scoped-sharing#> .
+
+# Use case B. Sharing data within the limits of consent.
+# Sources: UCM discharge story, step 5 and the "consent limits are visible" criterion;
+# UCM nutrition story, steps 5 and 9 and the "pantry sees only what was agreed" criterion.
+# All people and organizations are fictional. Signatures are placeholders.
+#
+# Every statement is read from, or written to, a holon container in Delphine's Solid Pod,
+# and every consent is a Web Access Control rule in that container's .acl. Because WAC
+# grants access per container, each consent limit is also a choice of where data lives.
+
+@prefix dme:    <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:  <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dbhb:   <https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#> .
+@prefix dbh:    <https://pod.example/delphine/holon/behavioral-health/event.jsonld#> .
+@prefix dbhacl: <https://pod.example/delphine/holon/behavioral-health/.acl#> .
+@prefix dclinb: <https://pod.example/delphine/holon/clinical/boundary.jsonld#> .
+@prefix dclin:  <https://pod.example/delphine/holon/clinical/event.jsonld#> .
+@prefix dclinacl: <https://pod.example/delphine/holon/clinical/.acl#> .
+@prefix dccb:   <https://pod.example/delphine/holon/care-coordination/boundary.jsonld#> .
+@prefix dcc:    <https://pod.example/delphine/holon/care-coordination/event.jsonld#> .
+@prefix dccacl: <https://pod.example/delphine/holon/care-coordination/.acl#> .
+@prefix dfsb:   <https://pod.example/delphine/holon/food-security/boundary.jsonld#> .
+@prefix dfs:    <https://pod.example/delphine/holon/food-security/event.jsonld#> .
+@prefix dfsacl: <https://pod.example/delphine/holon/food-security/.acl#> .
+@prefix log:    <https://pod.example/delphine/holon/access-log/event.jsonld#> .
+@prefix rb:     <https://riverbend.example/agents/care-transitions#> .
+@prefix ng:     <https://northgate.example/agents/coordination#> .
+@prefix pantry: <https://eastside-neighbors.example/agents/pantry#> .
+
+##### Solid Pod: Delphine's personal data locker #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" ;
+    ucm:participatesThrough dbh:p-patient , dclin:p-patient , dcc:p-beneficiary .
+
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ;
+    dcterms:subject dme:me ; holon:contains dbhb:holon , dclinb:holon , dccb:holon , dfsb:holon .
+dbhb:holon   a holon:DataHolon ;    rdfs:label "Delphine's behavioral health" ;  holon:partOf dlock:holon .
+dclinb:holon a holon:DataHolon ;    rdfs:label "Delphine's clinical care" ;      holon:partOf dlock:holon .
+dccb:holon   a holon:ProcessHolon ; rdfs:label "Delphine's care coordination" ;  holon:partOf dlock:holon .
+dfsb:holon   a holon:ProcessHolon ; rdfs:label "Delphine's food security coordination" ; holon:partOf dlock:holon .
+
+# Consent records, one .acl per container. Only Northgate can read behavioral health;
+# only the pantry's own container is open to the pantry.
+dbhacl:northgate a acl:Authorization ; acl:agent ng:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/behavioral-health/> ;
+    acl:default  <https://pod.example/delphine/holon/behavioral-health/> ;
+    acl:mode acl:Read , acl:Write ; dcterms:conformsTo dbhb:northgate-terms .
+dccacl:northgate a acl:Authorization ; acl:agent ng:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/care-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/care-coordination/> ;
+    acl:mode acl:Append ; dcterms:conformsTo dbhb:northgate-terms .
+dclinacl:riverbend a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/clinical/> ;
+    acl:default  <https://pod.example/delphine/holon/clinical/> ;
+    acl:mode acl:Read .
+dccacl:riverbend a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/care-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/care-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+dfsacl:riverbend a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/food-security/> ;
+    acl:default  <https://pod.example/delphine/holon/food-security/> ;
+    acl:mode acl:Read , acl:Append .
+dfsacl:pantry a acl:Authorization ; acl:agent pantry:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/food-security/> ;
+    acl:default  <https://pod.example/delphine/holon/food-security/> ;
+    acl:mode acl:Read ; dcterms:conformsTo dfsb:pantry-policy .
+
+##### UCM content, stored in the holons #####
+
+:northgate a ucm:Organization ; rdfs:label "Northgate Community Mental Health" .
+:riverbend a ucm:Organization ; rdfs:label "Riverbend General Hospital" .
+:eastside  a ucm:CommunityGroup ; rdfs:label "Eastside Neighbors (food pantry)" .
+
+dbhb:behavioral-context a ucm:BehavioralHealthContext ; ucm:definedByArtifact dbhb:northgate-terms .
+dclinb:clinical-context a ucm:ClinicalCareContext .
+dlock:social-context    a ucm:SocialCareContext ; rdfs:label "Delphine's social care" .
+dfsb:pantry-context     a ucm:SocialCareContext ; rdfs:label "Pantry meal service" ; ucm:definedByArtifact dfsb:pantry-policy .
+
+dbhb:northgate-terms a ucm:PolicyDefinition ;
+    rdfs:label "Therapy notes stay inside the Behavioral Health context; only a coordination summary is shared." .
+dfsb:pantry-policy a ucm:PolicyDefinition ;
+    rdfs:label "Pantry data limit: diet type and pickup details only, nothing from the Clinical Care context." .
+
+dlock:patient-role a ucm:PatientRole . dlock:beneficiary-role a ucm:BeneficiaryRole .
+dbh:p-patient     a ucm:Participation ; ucm:assumesRole dlock:patient-role ;     ucm:scopedBy dbhb:behavioral-context .
+dclin:p-patient   a ucm:Participation ; ucm:assumesRole dlock:patient-role ;     ucm:scopedBy dclinb:clinical-context .
+dcc:p-beneficiary a ucm:Participation ; ucm:assumesRole dlock:beneficiary-role ; ucm:scopedBy dlock:social-context .
+
+dbh:session-note a ucm:ClinicalStatement ; rdfs:label "Counseling session note" ;
+    ucm:madeWithinContext dbhb:behavioral-context ; ucm:statementSubject dbh:p-patient ;
+    ucm:statementDate "2026-09-15T16:00:00Z"^^xsd:dateTime .
+dcc:bh-summary a ucm:CareCoordinationStatement , core:Artifact ;
+    rdfs:label "Summary: engaged in counseling; weekly sessions; no barriers to discharge" ;
+    ucm:madeWithinContext dlock:social-context ; ucm:statementSubject dcc:p-beneficiary ;
+    ucm:statementDate "2026-09-16T09:10:00Z"^^xsd:dateTime .
+dclin:malnutrition-dx a ucm:DiagnosisStatement ; rdfs:label "Moderate malnutrition" ;
+    ucm:madeWithinContext dclinb:clinical-context ; ucm:statementSubject dclin:p-patient ;
+    ucm:statementDate "2026-11-03T14:00:00Z"^^xsd:dateTime .
+dfs:diet-order a ucm:CareCoordinationStatement , core:Artifact ;
+    rdfs:label "Diet type: soft texture, high protein. Pickup: Tuesdays." ;
+    ucm:madeWithinContext dfsb:pantry-context ; ucm:statementSubject dcc:p-beneficiary ;
+    ucm:statementDate "2026-11-03T14:30:00Z"^^xsd:dateTime .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent (writes the .acl rules)" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+ng:agent a core:Agent ; rdfs:label "Northgate coordination agent" ;
+    prov:actedOnBehalfOf :northgate ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:northgate.example:agents:coordination" ] .
+rb:agent a core:Agent ; rdfs:label "Riverbend care transitions agent" ;
+    prov:actedOnBehalfOf :riverbend ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:riverbend.example:agents:care-transitions" ] .
+pantry:agent a core:Agent ; rdfs:label "Eastside pantry agent" ;
+    prov:actedOnBehalfOf :eastside ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:eastside-neighbors.example:agents:pantry" ] .
+
+##### Capabilities: a WAC access mode plus the UCM contexts it may touch #####
+
+:capReadCoordination a cap:Capability ; rdfs:label "Read care coordination statements" ;
+    cap:capabilityExpression "GET ucm:CareCoordinationStatement" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Read" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ;
+        cap:allowedContext "https://www.w3.org/ns/ucm#SocialCareContext" ;
+        cap:prohibitedContext "https://www.w3.org/ns/ucm#BehavioralHealthContext" , "https://www.w3.org/ns/ucm#ClinicalCareContext" ] .
+:capWriteCoordination a cap:Capability ; rdfs:label "Write care coordination statements" ;
+    cap:capabilityExpression "Append ucm:CareCoordinationStatement" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ; cap:allowedContext "https://www.w3.org/ns/ucm#SocialCareContext" ] .
+:capReadClinical a cap:Capability ; rdfs:label "Read clinical statements" ;
+    cap:capabilityExpression "GET ucm:ClinicalStatement, ucm:DiagnosisStatement" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Read" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ; cap:allowedContext "https://www.w3.org/ns/ucm#ClinicalCareContext" ;
+        cap:prohibitedContext "https://www.w3.org/ns/ucm#BehavioralHealthContext" ] .
+:capReadBehavioral a cap:Capability ; rdfs:label "Read behavioral health statements" ;
+    cap:capabilityExpression "GET ucm:ClinicalStatement in the Behavioral Health context" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Read" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ; cap:allowedContext "https://www.w3.org/ns/ucm#BehavioralHealthContext" ] .
+
+##### Delegation #####
+
+:chain a del:DelegationChain ; del:hasDelegation :d1 , :d2 , :d3 .
+
+:d1 a del:Delegation ; del:delegationId "B-D1" ;
+    del:note "Delphine consents to Northgate holding her therapy notes and appending a summary for the team." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo ng:agent ;
+    ext:consentRecord dbhacl:northgate , dccacl:northgate ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capReadBehavioral , :capWriteCoordination ;
+        del:validFrom "2026-09-14T15:05:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "B-D2" ;
+    del:note "Delphine consents to Riverbend reading clinical and coordination data. Behavioral health is not included." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ;
+    ext:consentRecord dclinacl:riverbend , dccacl:riverbend , dfsacl:riverbend ;
+    del:delegationScope [ a del:DelegationScope ;
+        del:allowedCapability :capReadClinical , :capReadCoordination , :capWriteCoordination ;
+        del:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "B-D3" ;
+    del:note "Riverbend passes the pantry one capability. Delphine's locker agent writes the pantry's rule on the food-security container only." ;
+    del:delegatedBy rb:agent ; del:delegatesTo pantry:agent ; ext:consentRecord dfsacl:pantry ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capReadCoordination ;
+        del:validFrom "2026-11-03T15:00:00Z"^^xsd:dateTime ] .
+
+##### Intents and actions: HTTP requests against Delphine's Pod #####
+
+:coordinateIntent a intent:Intent ; rdfs:label "Coordinate discharge without exposing therapy notes" ;
+    intent:authorizedBy :d2 ; intent:producesAction :actReadSummary , :actReadTherapyNote .
+:mealsIntent a intent:Intent ; rdfs:label "Fill a medically tailored meal order" ;
+    intent:authorizedBy :d3 ; intent:producesAction :actReadDietOrder , :actReadDiagnosis .
+rb:agent core:hasIntent :coordinateIntent . pantry:agent core:hasIntent :mealsIntent .
+
+:actWriteSummary    a core:Action ; rdfs:label "Northgate appends the coordination summary" ;    core:producesArtifact dcc:bh-summary .
+:actReadSummary     a core:Action ; rdfs:label "Riverbend reads the coordination summary" ;     prov:used dcc:bh-summary .
+:actReadTherapyNote a core:Action ; rdfs:label "Riverbend asks for the session note" ;          prov:used dbh:session-note .
+:actWriteDietOrder  a core:Action ; rdfs:label "Riverbend's dietitian appends the diet order" ; core:producesArtifact dfs:diet-order .
+:actReadDietOrder   a core:Action ; rdfs:label "Pantry reads the diet order" ;                  prov:used dfs:diet-order .
+:actReadDiagnosis   a core:Action ; rdfs:label "Pantry asks for the diagnosis" ;                prov:used dclin:malnutrition-dx .
+ng:agent     core:executesAction :actWriteSummary .
+rb:agent     core:executesAction :actReadSummary , :actReadTherapyNote , :actWriteDietOrder .
+pantry:agent core:executesAction :actReadDietOrder , :actReadDiagnosis .
+
+:gate a core:ExecutionContext ; rdfs:label "Delphine's Pod server (JSS) enforcing Web Access Control" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, the delegation is live, the target statement's context is allowed, and an ACL rule grants the actor the mode on the target's container." ] ;
+    sec:hasDataHandlingPolicy
+        [ a sec:DataHandlingPolicy ; sec:encryptionRequired true ; sec:policyURI "https://pod.example/delphine/holon/behavioral-health/boundary.jsonld#northgate-terms"^^xsd:anyURI ] ,
+        [ a sec:DataHandlingPolicy ; sec:encryptionRequired true ; sec:policyURI "https://pod.example/delphine/holon/food-security/boundary.jsonld#pantry-policy"^^xsd:anyURI ] .
+
+##### Execution record: append-only, hash-chained, signed #####
+
+log:e01 a ledger:GovernanceLedgerEvent ; rdfs:label "Delphine consents to Riverbend's care team" ;
+    ledger:eventId "CSS-001" ; hev:eventSequence 1 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d2 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:hash "sha256:a3507dd457b49407c8826378053391bae8a7dc3932e39ceb2fa7228cb03d0960" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-a3507dd457b4" .
+log:e02 a ledger:GovernanceLedgerEvent ; rdfs:label "Delphine consents to Northgate, summary sharing only" ;
+    ledger:eventId "CSS-002" ; hev:eventSequence 2 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T15:05:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d1 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:a3507dd457b49407c8826378053391bae8a7dc3932e39ceb2fa7228cb03d0960" ;
+    ledger:hash "sha256:0709e4311f1a273152588c95573f253c3068a0d3b12561f204b5c03aa2f74f2d" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-0709e4311f1a" .
+log:e03 a ledger:RuntimeLedgerEvent ; rdfs:label "Northgate appends a coordination summary" ;
+    ledger:eventId "CSS-003" ; hev:eventSequence 3 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-16T09:10:00Z"^^xsd:dateTime ;
+    ledger:actor ng:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capWriteCoordination ; ledger:action :actWriteSummary ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:0709e4311f1a273152588c95573f253c3068a0d3b12561f204b5c03aa2f74f2d" ;
+    ledger:hash "sha256:b2f88d5c5b82a8561b329ae34d2ca84094f4f4dbaca6e230101c4769c2f644a7" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:northgate.example:agents:coordination#key-1" ;
+    ledger:signature "placeholder-signature-b2f88d5c5b82" .
+log:e04 a ledger:RuntimeLedgerEvent ; rdfs:label "Riverbend reads the summary" ;
+    ledger:eventId "CSS-004" ; hev:eventSequence 4 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-16T09:30:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capReadCoordination ; ledger:action :actReadSummary ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:b2f88d5c5b82a8561b329ae34d2ca84094f4f4dbaca6e230101c4769c2f644a7" ;
+    ledger:hash "sha256:f2e2067a1149fd93558ef63cbe98be3950b4d2a2c569b93dc19a5ecee1cb0ed4" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-f2e2067a1149" .
+log:e05 a ledger:RuntimeLedgerEvent ; rdfs:label "Denied: no ACL rule for Riverbend on behavioral-health, and the note is in that context" ;
+    ledger:eventId "CSS-005" ; hev:eventSequence 5 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-16T09:31:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capReadCoordination ; ledger:action :actReadTherapyNote ; ext:verdict "deny" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:f2e2067a1149fd93558ef63cbe98be3950b4d2a2c569b93dc19a5ecee1cb0ed4" ;
+    ledger:hash "sha256:085a29c97c6531f1942f53cca4112c7a2d9e30e74f3adc0cd5a9fc2e0fa0070e" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-085a29c97c65" .
+log:e06 a ledger:RuntimeLedgerEvent ; rdfs:label "Denied: capability was never delegated to Riverbend" ;
+    ledger:eventId "CSS-006" ; hev:eventSequence 6 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-16T09:32:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capReadBehavioral ; ledger:action :actReadTherapyNote ; ext:verdict "deny" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:085a29c97c6531f1942f53cca4112c7a2d9e30e74f3adc0cd5a9fc2e0fa0070e" ;
+    ledger:hash "sha256:07d9abb73b7aeff3313b346b6e5c5b601dd81e195f873847f882a119e61d4305" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-07d9abb73b7a" .
+log:e07 a ledger:RuntimeLedgerEvent ; rdfs:label "Diet order appended to the food-security holon" ;
+    ledger:eventId "CSS-007" ; hev:eventSequence 7 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-03T14:30:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capWriteCoordination ; ledger:action :actWriteDietOrder ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:07d9abb73b7aeff3313b346b6e5c5b601dd81e195f873847f882a119e61d4305" ;
+    ledger:hash "sha256:8dda8eee0bb6c46bedcff1a2dbb73dfa2c3d51454c3b5a16aeb40fa2a2c13f94" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-8dda8eee0bb6" .
+log:e08 a ledger:GovernanceLedgerEvent ; rdfs:label "Riverbend passes read-coordination to the pantry" ;
+    ledger:eventId "CSS-008" ; hev:eventSequence 8 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-03T15:00:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d3 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:8dda8eee0bb6c46bedcff1a2dbb73dfa2c3d51454c3b5a16aeb40fa2a2c13f94" ;
+    ledger:hash "sha256:59cf39125bdcfc0513bbe9610e46a8dba50acc042cc7a120d690a4daa31c09ff" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-59cf39125bdc" .
+log:e09 a ledger:RuntimeLedgerEvent ; rdfs:label "Pantry reads diet type and pickup details" ;
+    ledger:eventId "CSS-009" ; hev:eventSequence 9 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-03T15:20:00Z"^^xsd:dateTime ;
+    ledger:actor pantry:agent ; ledger:delegation :d3 ;
+    ledger:usesCapability :capReadCoordination ; ledger:action :actReadDietOrder ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:59cf39125bdcfc0513bbe9610e46a8dba50acc042cc7a120d690a4daa31c09ff" ;
+    ledger:hash "sha256:466fc5569271adee7fcc377d340cfa2ae8e7fe9470d54ed03873e21cbd691234" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:eastside-neighbors.example:agents:pantry#key-1" ;
+    ledger:signature "placeholder-signature-466fc5569271" .
+log:e10 a ledger:RuntimeLedgerEvent ; rdfs:label "Denied: the pantry has no ACL rule on the clinical container" ;
+    ledger:eventId "CSS-010" ; hev:eventSequence 10 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-03T15:21:00Z"^^xsd:dateTime ;
+    ledger:actor pantry:agent ; ledger:delegation :d3 ;
+    ledger:usesCapability :capReadCoordination ; ledger:action :actReadDiagnosis ; ext:verdict "deny" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:466fc5569271adee7fcc377d340cfa2ae8e7fe9470d54ed03873e21cbd691234" ;
+    ledger:hash "sha256:587d800431940f1b869900fa6c5e448dd49a173642af3748f18672e5af4e1f56" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:eastside-neighbors.example:agents:pantry#key-1" ;
+    ledger:signature "placeholder-signature-587d80043194" .

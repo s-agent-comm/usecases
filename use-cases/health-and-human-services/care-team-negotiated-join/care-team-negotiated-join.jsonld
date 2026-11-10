@@ -1,0 +1,996 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://northgate.example/agents/coordination#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab4"
+      },
+      "core:executesAction": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actAcceptNorthgate"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#northgate"
+      },
+      "rdfs:label": "Northgate coordination agent"
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab4",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:northgate.example:agents:coordination"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capAssertMatch",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Write a ucm:MatchClaim about Delphine's WebID",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Write",
+      "rdfs:label": "Assert an identity match"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#handshake-harborlight",
+      "@type": [
+        "ucm:Handshake",
+        "core:Artifact"
+      ],
+      "ucm:hasLifecycleState": {
+        "@id": "ucm:Accepted"
+      },
+      "ucm:negotiates": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#riverbend",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Write"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-harborlight",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#provider-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#handshake-harborlight"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#owner",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Write"
+        },
+        {
+          "@id": "acl:Control"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-tomasz",
+      "@type": "ucm:Membership",
+      "ucm:membershipIn": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#care-team"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestNorthgate",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#request-northgate"
+      },
+      "rdfs:label": "Write the coordination request to Northgate"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capHousingReferral",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Append a ucm:Handshake; run ucm:HousingAssessment",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Append",
+      "rdfs:label": "Act on a housing referral"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e02",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 2,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actMatch"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1"
+      },
+      "ledger:eventId": "CTNJ-002",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#gate"
+      },
+      "ledger:hash": "sha256:99e0720abfa9ab51b8916e0ba28c2bfe5abc6dcbbdd13e9b4aff5aa0c36ac213",
+      "ledger:previousEventHash": "sha256:04ca3ca0213ddcb61b9d483db2a1362691ae89dd22bbbedf9ed7ed7ea2cea1c2",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-99e0720abfa9",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T10:40:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capAssertMatch"
+      },
+      "rdfs:label": "MatchClaim: Harborlight's record is Delphine's WebID"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#request-harborlight",
+      "@type": [
+        "ucm:CoordinationRequest",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Request: housing navigation"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e03",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 3,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestHarborlight"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1"
+      },
+      "ledger:eventId": "CTNJ-003",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#gate"
+      },
+      "ledger:hash": "sha256:93d23c25aa222c5ea753fc1f6ea1ac5799f01905dbedd495a462bd28b9c24f93",
+      "ledger:previousEventHash": "sha256:99e0720abfa9ab51b8916e0ba28c2bfe5abc6dcbbdd13e9b4aff5aa0c36ac213",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-93d23c25aa22",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T10:45:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capFormTeam"
+      },
+      "rdfs:label": "CoordinationRequest written for Harborlight"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestHarborlight",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#request-harborlight"
+      },
+      "rdfs:label": "Write the coordination request to Harborlight"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-delphine",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#beneficiary-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#safe-discharge",
+      "@type": "ucm:ActivityFocus",
+      "rdfs:label": "Safe discharge to stable housing"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#gate",
+      "@type": "core:ExecutionContext",
+      "rdfs:label": "Delphine's Pod server (JSS) enforcing Web Access Control",
+      "sec:hasAccessControlRule": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab9"
+      },
+      "sec:hasDataHandlingPolicy": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab10"
+      }
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab9",
+      "@type": "sec:AccessControlRule",
+      "sec:allowedAction": "Admit only if the actor is the delegate, the capability is in scope, the delegation is live, and the delegation's ACL rule grants the actor the needed mode on a container holding the target."
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab10",
+      "@type": "sec:DataHandlingPolicy",
+      "sec:encryptionRequired": true,
+      "sec:policyURI": {
+        "@type": "xsd:anyURI",
+        "@value": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d3",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "del:delegationId": "A-D3",
+      "del:delegationScope": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab8"
+      },
+      "del:note": "Riverbend invites Northgate, narrowed to summaries only, on Northgate's own terms.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#northgate"
+      }
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab8",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capShareSummary"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T15:05:00+00:00"
+      },
+      "del:validUntil": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-14T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e08",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 8,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actAcceptNorthgate"
+      },
+      "ledger:actor": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d3"
+      },
+      "ledger:eventId": "CTNJ-008",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#gate"
+      },
+      "ledger:hash": "sha256:d8727db2c5bab149feb3f4b7fe3ef38479f5b71a8c254f28345f28cb03c22ffe",
+      "ledger:previousEventHash": "sha256:7909277159aad5c38a668f8c2cc3466ec8705d94daf94c010307fe3981b84bf1",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:northgate.example:agents:coordination#key-1",
+      "ledger:signature": "placeholder-signature-d8727db2c5ba",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T15:05:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capShareSummary"
+      },
+      "rdfs:label": "Handshake accepted on Northgate's terms"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actAcceptNorthgate",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#handshake-northgate"
+      },
+      "rdfs:label": "Append Northgate's acceptance, on its terms"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#match-harborlight",
+      "@type": [
+        "ucm:MatchClaim",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Harborlight client record 'D. Arceneaux' is the Person identified by Delphine's WebID",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T10:40:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-delphine"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actAcceptHarborlight",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#handshake-harborlight"
+      },
+      "rdfs:label": "Append Harborlight's acceptance"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab1"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "rdfs:label": "Delphine's locker agent"
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab1",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:pod.example:delphine"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#chain",
+      "@type": "del:DelegationChain",
+      "del:hasDelegation": [
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d2"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d3"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#northgate",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://northgate.example/agents/coordination#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ],
+      "dcterms:conformsTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#northgate",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Northgate Community Mental Health",
+      "ucm:acceptsRequest": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-northgate"
+      },
+      "ucm:participatesThrough": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-northgate"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#tomasz",
+      "@type": "ucm:Person",
+      "rdfs:label": "Tomasz Brennan",
+      "ucm:affiliatedWith": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#riverbend"
+      },
+      "ucm:hasMembership": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-tomasz"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#handshake-northgate",
+      "@type": [
+        "ucm:Handshake",
+        "core:Artifact"
+      ],
+      "ucm:hasLifecycleState": {
+        "@id": "ucm:Accepted"
+      },
+      "ucm:negotiates": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#northgate-terms",
+      "@type": "ucm:PolicyDefinition",
+      "rdfs:label": "Northgate terms: share a coordination summary only; therapy notes stay in the Behavioral Health context"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#harborlight",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://riverbend.example/agents/care-transitions#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab2"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestHarborlight"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestNorthgate"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actMatch"
+        }
+      ],
+      "core:hasIntent": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#formTeamIntent"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#riverbend"
+      },
+      "rdfs:label": "Riverbend care transitions agent"
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab2",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:riverbend.example:agents:care-transitions"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegationId": "A-D1",
+      "del:delegationScope": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab6"
+      },
+      "del:note": "Delphine consents to Riverbend coordinating her discharge.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#riverbend"
+      }
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab6",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": [
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capFormTeam"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capAssertMatch"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capHousingReferral"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capShareSummary"
+        }
+      ],
+      "del:intentConstraint": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#formTeamIntent"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      },
+      "del:validUntil": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-14T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#care-team",
+      "@type": "ucm:CareTeam",
+      "rdfs:label": "Delphine's care team",
+      "ucm:definedByCriteria": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#team-criteria"
+      },
+      "ucm:hasMember": [
+        {
+          "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#tomasz"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#amara"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#priya"
+        }
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#priya",
+      "@type": "ucm:Person",
+      "rdfs:label": "Priya Castellanos",
+      "ucm:affiliatedWith": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#northgate"
+      },
+      "ucm:hasMembership": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-priya"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#formTeamIntent",
+      "@type": "intent:Intent",
+      "intent:authorizedBy": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1"
+      },
+      "intent:producesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestHarborlight"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestNorthgate"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actMatch"
+        }
+      ],
+      "rdfs:label": "Form a cross-domain care team for a safe discharge to stable housing"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context",
+      "@type": "ucm:SocialCareContext",
+      "rdfs:label": "Delphine's social care"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-amara",
+      "@type": "ucm:Membership",
+      "ucm:membershipIn": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#care-team"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T11:20:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#harborlight",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Harborlight Housing Collaborative",
+      "ucm:acceptsRequest": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-harborlight"
+      },
+      "ucm:participatesThrough": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-harborlight"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#behavioral-context",
+      "@type": "ucm:BehavioralHealthContext",
+      "ucm:definedByArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#northgate-terms"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capShareSummary",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Append a ucm:Handshake or ucm:CareCoordinationStatement",
+      "cap:hasConstraint": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab5"
+      },
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Append",
+      "rdfs:label": "Share a care coordination summary"
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab5",
+      "@type": "cap:CapabilityConstraint",
+      "cap:allowedContext": "https://www.w3.org/ns/ucm#SocialCareContext",
+      "cap:prohibitedContext": "https://www.w3.org/ns/ucm#BehavioralHealthContext"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#amara",
+      "@type": "ucm:Person",
+      "rdfs:label": "Amara Lindqvist",
+      "ucm:affiliatedWith": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#harborlight"
+      },
+      "ucm:hasMembership": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-amara"
+      }
+    },
+    {
+      "@id": "https://harborlight.example/agents/intake#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab3"
+      },
+      "core:executesAction": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actAcceptHarborlight"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#harborlight"
+      },
+      "rdfs:label": "Harborlight intake agent"
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab3",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:harborlight.example:agents:intake"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capFormTeam",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Write ucm:CoordinationRequest and team membership into the discharge-coordination holon",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Write",
+      "rdfs:label": "Form and manage the care team"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon",
+      "@type": "holon:AgentHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "holon:contains": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's personal data locker"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-priya",
+      "@type": "ucm:Membership",
+      "ucm:membershipIn": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#care-team"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T15:05:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#beneficiary-role",
+      "@type": "ucm:BeneficiaryRole"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e04",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 4,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actRequestNorthgate"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1"
+      },
+      "ledger:eventId": "CTNJ-004",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#gate"
+      },
+      "ledger:hash": "sha256:23b601beecdbc8ca83c6d5581192a837f52fcc51c88295b7082c99631d9b7e98",
+      "ledger:previousEventHash": "sha256:93d23c25aa222c5ea753fc1f6ea1ac5799f01905dbedd495a462bd28b9c24f93",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-23b601beecdb",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T10:46:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capFormTeam"
+      },
+      "rdfs:label": "CoordinationRequest written for Northgate"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#holon",
+      "@type": "holon:ProcessHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      },
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's discharge coordination"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#request-northgate",
+      "@type": [
+        "ucm:CoordinationRequest",
+        "core:Artifact"
+      ],
+      "rdfs:label": "Request: behavioral health coordination"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#provider-role",
+      "@type": "ucm:ProviderRole"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#team-criteria",
+      "@type": "ucm:MembershipCriteria",
+      "rdfs:label": "Consent on file in Delphine's Pod and an accepted handshake"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e01",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 1,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d1"
+      },
+      "ledger:eventId": "CTNJ-001",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:04ca3ca0213ddcb61b9d483db2a1362691ae89dd22bbbedf9ed7ed7ea2cea1c2",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-04ca3ca0213d",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      },
+      "rdfs:label": "Delphine consents to Riverbend coordinating her discharge"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e05",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 5,
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d2"
+      },
+      "ledger:eventId": "CTNJ-005",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:1d4512f6d77ae208e09a9b48689f7dcaed0fa155a88a6c0484133631164e8347",
+      "ledger:previousEventHash": "sha256:23b601beecdbc8ca83c6d5581192a837f52fcc51c88295b7082c99631d9b7e98",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-1d4512f6d77a",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T10:47:00+00:00"
+      },
+      "rdfs:label": "Sub-delegation offered to Harborlight"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#riverbend",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Riverbend General Hospital"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d2",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "del:delegationId": "A-D2",
+      "del:delegationScope": {
+        "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab7"
+      },
+      "del:note": "Riverbend invites Harborlight. Delphine's locker agent writes the ACL rule, since only the Pod owner holds acl:Control.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#harborlight"
+      }
+    },
+    {
+      "@id": "_:nd75a0c9b441f4388a0c6d4a4995eb89ab7",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capHousingReferral"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T11:20:00+00:00"
+      },
+      "del:validUntil": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-14T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e06",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 6,
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d3"
+      },
+      "ledger:eventId": "CTNJ-006",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:f1db5f51890183f482798401a9c1e628202e4d28d43b3fcbd9505aca6dbe413b",
+      "ledger:previousEventHash": "sha256:1d4512f6d77ae208e09a9b48689f7dcaed0fa155a88a6c0484133631164e8347",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-f1db5f518901",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T10:48:00+00:00"
+      },
+      "rdfs:label": "Sub-delegation offered to Northgate, summaries only"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-delphine",
+      "@type": "ucm:Membership",
+      "ucm:membershipIn": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#care-team"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-northgate",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#provider-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#handshake-northgate"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#behavioral-context"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e07",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 7,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actAcceptHarborlight"
+      },
+      "ledger:actor": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#d2"
+      },
+      "ledger:eventId": "CTNJ-007",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#gate"
+      },
+      "ledger:hash": "sha256:7909277159aad5c38a668f8c2cc3466ec8705d94daf94c010307fe3981b84bf1",
+      "ledger:previousEventHash": "sha256:f1db5f51890183f482798401a9c1e628202e4d28d43b3fcbd9505aca6dbe413b",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:harborlight.example:agents:intake#key-1",
+      "ledger:signature": "placeholder-signature-7909277159aa",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T11:20:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/care-team-negotiated-join#capHousingReferral"
+      },
+      "rdfs:label": "Handshake accepted as is"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/care-team-negotiated-join#actMatch",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#match-harborlight"
+      },
+      "rdfs:label": "Write the identity match"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination",
+      "@type": "ucm:CareCoordinationInteraction",
+      "rdfs:label": "Discharge coordination for Delphine",
+      "ucm:hasActivityFocus": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#safe-discharge"
+      },
+      "ucm:hasLifecycleState": {
+        "@id": "ucm:Accepted"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/profile/card.jsonld#me",
+      "@type": "ucm:Person",
+      "rdfs:label": "Delphine Arceneaux",
+      "ucm:hasMembership": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#m-delphine"
+      },
+      "ucm:participatesThrough": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-delphine"
+      }
+    }
+  ]
+}

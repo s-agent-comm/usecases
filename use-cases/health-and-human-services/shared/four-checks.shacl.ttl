@@ -1,0 +1,230 @@
+# Generic shapes for the four conformance checks proposed on public-s-agent-comm
+# (X. Zhao, 6 Nov 2026; individual contribution, not adopted by the CG).
+# They apply to every use case in this directory.
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix agent: <https://w3id.org/agent-ontology/agent#> .
+@prefix id:   <https://w3id.org/agent-ontology/identity#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix cap:  <https://w3id.org/agent-ontology/capability#> .
+@prefix ledger: <https://w3id.org/agent-ontology/ledger#> .
+@prefix sec:  <https://w3id.org/agent-ontology/security-binding#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix acl:  <http://www.w3.org/ns/auth/acl#> .
+@prefix hev:  <http://w3id.org/holon/event/> .
+@prefix chk:  <https://example.org/sac/hhs/four-checks#> .
+
+chk: sh:declare
+    [ sh:prefix "core" ;   sh:namespace "https://w3id.org/agent-ontology/core#"^^xsd:anyURI ] ,
+    [ sh:prefix "agent" ;  sh:namespace "https://w3id.org/agent-ontology/agent#"^^xsd:anyURI ] ,
+    [ sh:prefix "id" ;     sh:namespace "https://w3id.org/agent-ontology/identity#"^^xsd:anyURI ] ,
+    [ sh:prefix "del" ;    sh:namespace "https://w3id.org/agent-ontology/delegation#"^^xsd:anyURI ] ,
+    [ sh:prefix "cap" ;    sh:namespace "https://w3id.org/agent-ontology/capability#"^^xsd:anyURI ] ,
+    [ sh:prefix "ledger" ; sh:namespace "https://w3id.org/agent-ontology/ledger#"^^xsd:anyURI ] ,
+    [ sh:prefix "ucm" ;    sh:namespace "https://www.w3.org/ns/ucm#"^^xsd:anyURI ] ,
+    [ sh:prefix "ext" ;    sh:namespace "https://example.org/sac-ucm-ext#"^^xsd:anyURI ] ,
+    [ sh:prefix "prov" ;   sh:namespace "http://www.w3.org/ns/prov#"^^xsd:anyURI ] ,
+    [ sh:prefix "acl" ;    sh:namespace "http://www.w3.org/ns/auth/acl#"^^xsd:anyURI ] ,
+    [ sh:prefix "hev" ;    sh:namespace "http://w3id.org/holon/event/"^^xsd:anyURI ] .
+
+# ---------- Identity: every agent has a WebID, a DID and a principal ----------
+chk:AgentShape a sh:NodeShape ;
+    sh:targetClass core:Agent ;
+    sh:property [ sh:path ( agent:hasIdentity id:did ) ; sh:minCount 1 ;
+                  sh:pattern "^did:" ; sh:message "Agent needs a DID." ] ;
+    sh:property [ sh:path prov:actedOnBehalfOf ; sh:minCount 1 ;
+                  sh:message "Agent needs a principal it acts on behalf of (prov:actedOnBehalfOf, as in the Pod's locker agent)." ] ;
+    sh:sparql [
+        sh:message "The agent must be identified by an https WebID, so that a Pod's access control rules can name it." ;
+        sh:prefixes chk: ;
+        sh:select """SELECT $this WHERE { $this a core:Agent . FILTER (!STRSTARTS(STR($this), "https://")) }""" ] .
+
+# ---------- Consent: Pod access is granted by an ACL rule in the data subject's Pod ----------
+chk:ConsentShape a sh:NodeShape ;
+    sh:targetClass del:Delegation ;
+    sh:sparql [
+        sh:message "Consent missing: this delegation grants Pod access, so it needs a consent record (an acl:Authorization) whose acl:agent is the delegate." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this del:delegationScope/del:allowedCapability/cap:requiresPermission ?m ; del:delegatesTo ?to .
+                FILTER STRSTARTS(?m, "http://www.w3.org/ns/auth/acl#")
+                FILTER NOT EXISTS { $this ext:consentRecord ?r . ?r a acl:Authorization ; acl:agent ?to }
+            }""" ] ;
+    sh:sparql [
+        sh:message "Consent too narrow: a capability in this delegation needs an access mode that no consent record grants." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this del:delegationScope/del:allowedCapability ?value . ?value cap:requiresPermission ?m .
+                FILTER STRSTARTS(?m, "http://www.w3.org/ns/auth/acl#")
+                FILTER NOT EXISTS { $this ext:consentRecord/acl:mode ?mode . FILTER (STR(?mode) = ?m) }
+            }""" ] ;
+    sh:sparql [
+        sh:message "Consent in the wrong place: the record must be a rule in a .acl resource in the Pod of the person at the root of the chain." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ext:consentRecord ?value .
+                ?chain del:hasDelegation $this , ?root . ?root del:delegatedBy ?issuer .
+                FILTER NOT EXISTS { ?chain del:hasDelegation ?up . ?up del:delegatesTo ?issuer }
+                ?issuer prov:actedOnBehalfOf ?person .
+                BIND (STRBEFORE(STR(?person), "profile/card.jsonld") AS ?pod)
+                FILTER (?pod = "" || !STRSTARTS(STR(?value), ?pod) || !CONTAINS(STR(?value), "/.acl#"))
+            }""" ] .
+
+# ---------- Check 1: delegation-chain verifiability ----------
+chk:DelegationShape a sh:NodeShape ;
+    sh:targetClass del:Delegation ;
+    sh:property [ sh:path del:delegationId ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path del:delegatedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class core:Agent ] ;
+    sh:property [ sh:path del:delegatesTo ; sh:minCount 1 ; sh:maxCount 1 ; sh:class core:Agent ] ;
+    sh:property [ sh:path del:delegationScope ; sh:minCount 1 ; sh:maxCount 1 ; sh:class del:DelegationScope ] ;
+    sh:property [ sh:path ( del:delegationScope del:allowedCapability ) ; sh:minCount 1 ] ;
+    sh:property [ sh:path ( del:delegationScope del:validFrom ) ; sh:minCount 1 ] ;
+    sh:property [ sh:path [ sh:inversePath ledger:delegation ] ; sh:minCount 1 ;
+                  sh:message "Delegation must be granted by a signed ledger event." ] .
+
+chk:ChainShape a sh:NodeShape ;
+    sh:targetClass del:DelegationChain ;
+    sh:sparql [
+        sh:message "Check 1: a sub-delegation may not grant a capability its parent did not grant (attenuation)." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this del:hasDelegation ?value , ?parent .
+                ?parent del:delegatesTo ?issuer . ?value del:delegatedBy ?issuer .
+                ?value del:delegationScope/del:allowedCapability ?c .
+                FILTER NOT EXISTS { $this del:hasDelegation ?p2 . ?p2 del:delegatesTo ?issuer ;
+                                    del:delegationScope/del:allowedCapability ?c }
+            }""" ] ;
+    sh:sparql [
+        sh:message "Check 1: the chain needs exactly one root issuer, so every delegation traces back to one principal." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this WHERE {
+                { SELECT $this (COUNT(DISTINCT ?issuer) AS ?n) WHERE {
+                    $this a del:DelegationChain .
+                    OPTIONAL { $this del:hasDelegation ?root . ?root del:delegatedBy ?issuer .
+                        FILTER NOT EXISTS { $this del:hasDelegation ?up . ?up del:delegatesTo ?issuer } }
+                  } GROUP BY $this }
+                FILTER (?n != 1)
+            }""" ] .
+
+# ---------- Check 2: execution-record integrity ----------
+chk:LedgerEventShape a sh:NodeShape ;
+    sh:targetClass ledger:RuntimeLedgerEvent , ledger:GovernanceLedgerEvent ;
+    sh:property [ sh:path ledger:eventId ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path hev:eventSequence ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ] ;
+    sh:property [ sh:path ledger:hash ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ledger:previousEventHash ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ledger:signature ; sh:minCount 1 ] ;
+    sh:property [ sh:path ledger:proofType ; sh:minCount 1 ] ;
+    sh:property [ sh:path ledger:publicKey ; sh:minCount 1 ; sh:pattern "^did:" ] ;
+    sh:property [ sh:path ledger:actor ; sh:minCount 1 ; sh:maxCount 1 ; sh:class core:Agent ] ;
+    sh:property [ sh:path ledger:appendOnly ; sh:hasValue true ] ;
+    sh:sparql [
+        sh:message "Check 2: the event must be signed with a key of its own actor's DID." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ledger:publicKey ?value ; ledger:actor ?a . ?a agent:hasIdentity/id:did ?did .
+                FILTER (!STRSTARTS(?value, CONCAT(?did, "#")))
+            }""" ] ;
+    sh:sparql [
+        sh:message "Check 2: the log is not contiguous. previousEventHash must equal the hash of the event one position earlier." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this hev:eventSequence ?n .
+                OPTIONAL { $this ledger:previousEventHash ?prev }
+                OPTIONAL { ?before hev:eventSequence ?m ; ledger:hash ?h . FILTER (?m = ?n - 1) }
+                FILTER ( (?n = 1 && BOUND(?prev)) || (?n > 1 && (!BOUND(?prev) || !BOUND(?h) || ?prev != ?h)) )
+            }""" ] ;
+    sh:sparql [
+        sh:message "Check 2: two events share a position or a hash (fork)." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this hev:eventSequence ?n ; ledger:hash ?h .
+                ?other hev:eventSequence ?n2 ; ledger:hash ?h2 .
+                FILTER (?other != $this && (?n = ?n2 || ?h = ?h2))
+            }""" ] .
+
+# ---------- Check 3: authorization binding ----------
+chk:RuntimeEventShape a sh:NodeShape ;
+    sh:targetClass ledger:RuntimeLedgerEvent ;
+    sh:property [ sh:path ext:verdict ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "admit" "deny" ) ] ;
+    sh:property [ sh:path ledger:action ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ledger:usesCapability ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path ledger:delegation ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "Every gated action cites exactly one delegation as its authority." ] ;
+    sh:property [ sh:path ( ledger:executionContext sec:hasAccessControlRule ) ; sh:minCount 1 ] ;
+    sh:sparql [
+        sh:message "Check 3: the verdict does not reproduce. 'admit' requires that the actor is the delegate, the capability is in scope, neither the delegation nor any delegation above it in the chain is revoked or suspended at this point in the log, the target's UCM context is one the capability allows, and, for Pod data, the delegation's consent record grants the actor that access mode on a container holding the target; anything else must be 'deny'." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ext:verdict ?value ; hev:eventSequence ?n ; ledger:actor ?actor ;
+                      ledger:usesCapability ?c ; ledger:delegation ?d .
+                BIND ( EXISTS { ?d del:delegatesTo ?actor } AS ?isDelegate )
+                BIND ( EXISTS { ?d del:delegationScope/del:allowedCapability ?c } AS ?inScope )
+                BIND ( EXISTS { ?g a ledger:GovernanceLedgerEvent ; ledger:delegation ?d ;
+                                   ledger:governanceAction ext:Grant ; hev:eventSequence ?gn . FILTER (?gn < ?n) } AS ?granted )
+                BIND ( EXISTS { ?chain del:hasDelegation ?d , ?anc .
+                                ?d (del:delegatedBy/^del:delegatesTo)* ?anc .
+                                ?s a ledger:GovernanceLedgerEvent ; ledger:delegation ?anc ;
+                                   ledger:governanceAction ?act ; hev:eventSequence ?sn .
+                                FILTER (?act IN (ext:Revoke, ext:Suspend) && ?sn < ?n)
+                                FILTER NOT EXISTS { ?r a ledger:GovernanceLedgerEvent ; ledger:delegation ?anc ;
+                                   ledger:governanceAction ext:Reinstate ; hev:eventSequence ?rn . FILTER (?rn > ?sn && ?rn < ?n) } } AS ?stopped )
+                BIND ( EXISTS { $this ledger:action/(prov:used|core:producesArtifact) ?res . ?res ucm:madeWithinContext/a ?ctxClass .
+                                ?c cap:hasConstraint ?k .
+                                FILTER NOT EXISTS { ?c cap:hasConstraint/cap:allowedContext ?ok . FILTER (?ok = STR(?ctxClass)) } } AS ?wrongContext )
+                BIND ( EXISTS { ?c cap:requiresPermission ?m0 . FILTER STRSTARTS(?m0, "http://www.w3.org/ns/auth/acl#") } AS ?needsPod )
+                BIND ( EXISTS { $this ledger:action/(prov:used|core:producesArtifact) ?res .
+                                ?c cap:requiresPermission ?m .
+                                ?d ext:consentRecord ?r . ?r acl:agent ?actor ; acl:mode ?mode ; acl:default ?cont .
+                                FILTER (STR(?mode) = ?m && STRSTARTS(STR(?res), STR(?cont))) } AS ?podAllows )
+                BIND ( IF(?isDelegate && ?inScope && ?granted && !?stopped && !?wrongContext && (!?needsPod || ?podAllows), "admit", "deny") AS ?expected )
+                FILTER (?value != ?expected)
+            }""" ] .
+
+# ---------- Check 4: accountability continuity ----------
+chk:GovernanceEventShape a sh:NodeShape ;
+    sh:targetClass ledger:GovernanceLedgerEvent ;
+    sh:property [ sh:path ledger:governanceAction ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:in ( ext:Grant ext:Revoke ext:Suspend ext:Reinstate ) ] ;
+    sh:property [ sh:path ledger:delegation ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:sparql [
+        sh:message "Check 4: only the delegator may change a delegation's state." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ledger:actor ?a ; ledger:delegation ?d .
+                FILTER NOT EXISTS { ?d del:delegatedBy ?a }
+            }""" ] ;
+    sh:sparql [
+        sh:message "Check 4: orphaned authorization. Revoking a delegation must also revoke every sub-delegation issued under it." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                $this ledger:governanceAction ext:Revoke ; ledger:delegation ?d .
+                ?d del:delegatesTo ?mid .
+                ?chain del:hasDelegation ?d , ?value .
+                ?value del:delegatedBy ?mid .
+                FILTER NOT EXISTS { ?r a ledger:GovernanceLedgerEvent ; ledger:delegation ?value ;
+                                       ledger:governanceAction ext:Revoke }
+            }""" ] ;
+    sh:sparql [
+        sh:message "Check 4: a revoked delegation must carry an end date (del:validUntil) on its scope." ;
+        sh:prefixes chk: ;
+        sh:select """
+            SELECT $this WHERE {
+                $this ledger:governanceAction ext:Revoke ; ledger:delegation ?d .
+                FILTER NOT EXISTS { ?d del:delegationScope/del:validUntil ?t }
+            }""" ] .

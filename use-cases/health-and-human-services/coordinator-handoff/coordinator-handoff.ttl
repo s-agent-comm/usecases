@@ -1,0 +1,305 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix agent: <https://w3id.org/agent-ontology/agent#> .
+@prefix id:   <https://w3id.org/agent-ontology/identity#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix cap:  <https://w3id.org/agent-ontology/capability#> .
+@prefix intent: <https://w3id.org/agent-ontology/intent#> .
+@prefix ledger: <https://w3id.org/agent-ontology/ledger#> .
+@prefix sec:  <https://w3id.org/agent-ontology/security-binding#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix acl:  <http://www.w3.org/ns/auth/acl#> .
+@prefix holon: <http://w3id.org/holon/> .
+@prefix hev:  <http://w3id.org/holon/event/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix : <https://example.org/sac/hhs/coordinator-handoff#> .
+
+# Use case C. Handing off the coordinator role.
+# Source: UCM discharge story, step 9 and the "roles change, people don't" criterion.
+# All people and organizations are fictional. Signatures are placeholders.
+#
+# The care coordination record lives in Delphine's Solid Pod. Handing off coordination
+# means changing the rules in that container's .acl: Riverbend's coordinator rule is
+# removed, and Eastside's is added. The .acl only shows the current rules; the
+# governance events below keep the history.
+
+@prefix dme:     <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:   <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dcoordb: <https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#> .
+@prefix dcoord:  <https://pod.example/delphine/holon/discharge-coordination/event.jsonld#> .
+@prefix dcoordacl: <https://pod.example/delphine/holon/discharge-coordination/.acl#> .
+@prefix dclinb:  <https://pod.example/delphine/holon/clinical/boundary.jsonld#> .
+@prefix dclin:   <https://pod.example/delphine/holon/clinical/event.jsonld#> .
+@prefix dclinacl: <https://pod.example/delphine/holon/clinical/.acl#> .
+@prefix log:     <https://pod.example/delphine/holon/access-log/event.jsonld#> .
+@prefix rb:      <https://riverbend.example/agents/care-transitions#> .
+@prefix hl:      <https://harborlight.example/agents/intake#> .
+@prefix es:      <https://eastside-neighbors.example/agents/coordination#> .
+
+##### Solid Pod: Delphine's personal data locker #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" .
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ;
+    dcterms:subject dme:me ; holon:contains dcoordb:holon , dclinb:holon .
+dcoordb:holon a holon:ProcessHolon ; rdfs:label "Delphine's discharge coordination" ; holon:partOf dlock:holon .
+dclinb:holon  a holon:DataHolon ;    rdfs:label "Delphine's clinical care" ;          holon:partOf dlock:holon .
+
+# Consent records. Before discharge the .acl holds riverbend-coordinator and
+# harborlight-via-riverbend; after, it holds eastside, harborlight-via-eastside,
+# and (on the clinical container) riverbend-follow-up.
+dcoordacl:riverbend-coordinator a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Append .
+dcoordacl:harborlight-via-riverbend a acl:Authorization ; acl:agent hl:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+dclinacl:riverbend-follow-up a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/clinical/> ;
+    acl:default  <https://pod.example/delphine/holon/clinical/> ;
+    acl:mode acl:Read , acl:Append .
+dcoordacl:eastside a acl:Authorization ; acl:agent es:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Append .
+dcoordacl:harborlight-via-eastside a acl:Authorization ; acl:agent hl:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+
+##### UCM content #####
+
+:tomasz   a ucm:Person ; rdfs:label "Tomasz Brennan" ; ucm:affiliatedWith :riverbend ;
+    ucm:participatesThrough dcoord:p-tomasz-coordinator , dcoord:p-tomasz-provider .
+:samuel   a ucm:Person ; rdfs:label "Samuel Whitfield" ; ucm:affiliatedWith :eastside ;
+    ucm:participatesThrough dcoord:p-samuel-coordinator .
+:riverbend   a ucm:Organization ; rdfs:label "Riverbend General Hospital" .
+:eastside    a ucm:CommunityGroup ; rdfs:label "Eastside Neighbors" .
+:harborlight a ucm:Organization ; rdfs:label "Harborlight Housing Collaborative" .
+
+dclinb:clinical-context a ucm:ClinicalCareContext .
+dlock:social-context    a ucm:SocialCareContext ; rdfs:label "Delphine's social care" .
+dcoordb:coordinator-role a ucm:CoordinatorRole . dcoordb:provider-role a ucm:ProviderRole .
+
+dcoord:coordination a ucm:CareCoordinationInteraction ; rdfs:label "Discharge coordination" ;
+    ucm:hasActivityFocus [ a ucm:ActivityFocus ; rdfs:label "Safe discharge to stable housing" ] .
+
+# Same people, new roles. The participations end and begin when the delegations do.
+dcoord:p-tomasz-coordinator a ucm:Participation ; ucm:assumesRole dcoordb:coordinator-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dclinb:clinical-context ;
+    ucm:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ; ucm:validTo "2026-10-02T12:00:00Z"^^xsd:dateTime .
+dcoord:p-tomasz-provider a ucm:Participation ; ucm:assumesRole dcoordb:provider-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dclinb:clinical-context ;
+    ucm:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime .
+dcoord:p-samuel-coordinator a ucm:Participation ; ucm:assumesRole dcoordb:coordinator-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dlock:social-context ;
+    ucm:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime .
+
+dcoord:open-tasks a core:Artifact , ucm:CareCoordinationStatement ;
+    rdfs:label "Open tasks at handoff: housing lease signing, 7-day follow-up call, pulse oximeter setup" ;
+    ucm:madeWithinContext dlock:social-context ; ucm:statementSubject dcoord:p-samuel-coordinator ;
+    ucm:statementDate "2026-10-02T12:00:00Z"^^xsd:dateTime .
+dcoord:lease-task-1 a core:Artifact ; rdfs:label "Lease-signing task update" .
+dcoord:lease-task-2 a core:Artifact ; rdfs:label "Lease-signing task update (under Eastside)" .
+dcoord:late-request a core:Artifact ; rdfs:label "Coordination request Riverbend tried to send after handoff" .
+dcoord:stale-lease  a core:Artifact ; rdfs:label "Lease task update Harborlight tried under Riverbend's old authority" .
+dclin:follow-up-call a core:Artifact ; rdfs:label "7-day follow-up call note" .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+rb:agent a core:Agent ; rdfs:label "Riverbend care transitions agent" ;
+    prov:actedOnBehalfOf :riverbend ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:riverbend.example:agents:care-transitions" ] .
+es:agent a core:Agent ; rdfs:label "Eastside Neighbors coordination agent" ;
+    prov:actedOnBehalfOf :eastside ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:eastside-neighbors.example:agents:coordination" ] .
+hl:agent a core:Agent ; rdfs:label "Harborlight intake agent" ;
+    prov:actedOnBehalfOf :harborlight ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:harborlight.example:agents:intake" ] .
+
+##### Capabilities #####
+
+:capCoordinate a cap:Capability ; rdfs:label "Coordinate the care team" ;
+    cap:capabilityExpression "Write requests, membership and task assignments in the discharge-coordination holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Write" .
+:capHousingTasks a cap:Capability ; rdfs:label "Work housing tasks for the team" ;
+    cap:capabilityExpression "Append housing task updates to the discharge-coordination holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+:capFollowUp a cap:Capability ; rdfs:label "Clinical follow-up" ;
+    cap:capabilityExpression "Append the 7-day follow-up note to the clinical holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+
+##### Delegation #####
+
+:chain a del:DelegationChain ; del:hasDelegation :d1 , :d2 , :d3 , :d4 , :d5 .
+
+:d1 a del:Delegation ; del:delegationId "C-D1" ; del:note "Riverbend coordinates (Tomasz's coordinator role)." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ; ext:realizesParticipation dcoord:p-tomasz-coordinator ;
+    ext:consentRecord dcoordacl:riverbend-coordinator ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capCoordinate , :capHousingTasks ;
+        del:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ; del:validUntil "2026-10-02T12:00:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "C-D2" ; del:note "Riverbend brings Harborlight in for housing tasks." ;
+    del:delegatedBy rb:agent ; del:delegatesTo hl:agent ; ext:consentRecord dcoordacl:harborlight-via-riverbend ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capHousingTasks ;
+        del:validFrom "2026-09-14T11:20:00Z"^^xsd:dateTime ; del:validUntil "2026-10-02T12:00:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "C-D3" ; del:note "Riverbend stays on for the follow-up call (Tomasz's provider role)." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ; ext:realizesParticipation dcoord:p-tomasz-provider ;
+    ext:consentRecord dclinacl:riverbend-follow-up ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capFollowUp ;
+        del:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime ; del:validUntil "2026-10-09T12:00:00Z"^^xsd:dateTime ] .
+:d4 a del:Delegation ; del:delegationId "C-D4" ; del:note "Eastside takes over coordination (Samuel's coordinator role)." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo es:agent ; ext:realizesParticipation dcoord:p-samuel-coordinator ;
+    ext:consentRecord dcoordacl:eastside ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capCoordinate , :capHousingTasks ;
+        del:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime ] .
+:d5 a del:Delegation ; del:delegationId "C-D5" ; del:note "Eastside re-issues Harborlight's housing tasks under its own authority." ;
+    del:delegatedBy es:agent ; del:delegatesTo hl:agent ; ext:consentRecord dcoordacl:harborlight-via-eastside ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capHousingTasks ;
+        del:validFrom "2026-10-02T12:05:00Z"^^xsd:dateTime ] .
+
+##### Intent and actions: HTTP requests against Delphine's Pod #####
+
+:handoffIntent a intent:Intent ; rdfs:label "Hand coordination to the community health worker with no gap and no leftover authority" ;
+    intent:authorizedBy :d1 ; intent:producesAction :actHandoffNote .
+rb:agent core:hasIntent :handoffIntent .
+
+:actHandoffNote  a core:Action ; rdfs:label "Riverbend writes the open-task handoff note" ;                core:producesArtifact dcoord:open-tasks .
+:actLeaseTask    a core:Action ; rdfs:label "Harborlight appends a lease-signing task update" ;           core:producesArtifact dcoord:lease-task-1 .
+:actLateRequest  a core:Action ; rdfs:label "Riverbend tries to write a new coordination request after handoff" ; core:producesArtifact dcoord:late-request .
+:actFollowUpCall a core:Action ; rdfs:label "Riverbend appends the 7-day follow-up call note" ;           core:producesArtifact dclin:follow-up-call .
+:actStaleLease   a core:Action ; rdfs:label "Harborlight uses its old Riverbend authority" ;               core:producesArtifact dcoord:stale-lease .
+:actLeaseTask2   a core:Action ; rdfs:label "Harborlight appends a lease task update under Eastside's authority" ; core:producesArtifact dcoord:lease-task-2 .
+rb:agent core:executesAction :actHandoffNote , :actLateRequest , :actFollowUpCall .
+hl:agent core:executesAction :actLeaseTask , :actStaleLease , :actLeaseTask2 .
+
+:gate a core:ExecutionContext ; rdfs:label "Delphine's Pod server (JSS) enforcing Web Access Control" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, no delegation on its path is revoked or suspended, and an ACL rule grants the needed mode." ] .
+
+##### Execution record: append-only, hash-chained, signed #####
+
+log:e01 a ledger:GovernanceLedgerEvent ; rdfs:label "Riverbend becomes coordinator: rule added to discharge-coordination/.acl" ;
+    ledger:eventId "CH-001" ; hev:eventSequence 1 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d1 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:hash "sha256:66f9f9691b66e3d8690d591907b4c459a30e660c7f09a4c2e49e948761472d68" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-66f9f9691b66" .
+log:e02 a ledger:GovernanceLedgerEvent ; rdfs:label "Harborlight joins for housing tasks: locker agent adds its rule at Riverbend's request" ;
+    ledger:eventId "CH-002" ; hev:eventSequence 2 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-14T11:20:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:66f9f9691b66e3d8690d591907b4c459a30e660c7f09a4c2e49e948761472d68" ;
+    ledger:hash "sha256:db8f2c959d81fdf017248f722ec57d7628e4bc008ec486a76d399354b3ea8148" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-db8f2c959d81" .
+log:e03 a ledger:RuntimeLedgerEvent ; rdfs:label "Lease-signing task update appended" ;
+    ledger:eventId "CH-003" ; hev:eventSequence 3 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-09-30T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor hl:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capHousingTasks ; ledger:action :actLeaseTask ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:db8f2c959d81fdf017248f722ec57d7628e4bc008ec486a76d399354b3ea8148" ;
+    ledger:hash "sha256:60a3647c27dd6c984093206f3dcb4a09f0ff70c43d0ba4cbd6ccd69aa4ecd58a" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:harborlight.example:agents:intake#key-1" ;
+    ledger:signature "placeholder-signature-60a3647c27dd" .
+log:e04 a ledger:RuntimeLedgerEvent ; rdfs:label "Open-task handoff note written" ;
+    ledger:eventId "CH-004" ; hev:eventSequence 4 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-02T11:50:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capCoordinate ; ledger:action :actHandoffNote ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:60a3647c27dd6c984093206f3dcb4a09f0ff70c43d0ba4cbd6ccd69aa4ecd58a" ;
+    ledger:hash "sha256:021e0aaaa08ed0b08a7994874fc68c1b5070a83016c723623dd33b457a050e0b" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-021e0aaaa08e" .
+log:e05 a ledger:GovernanceLedgerEvent ; rdfs:label "Riverbend withdraws Harborlight's authority: locker agent removes the rule" ;
+    ledger:eventId "CH-005" ; hev:eventSequence 5 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-02T12:00:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d2 ;
+    ledger:governanceAction ext:Revoke ;
+    ledger:previousEventHash "sha256:021e0aaaa08ed0b08a7994874fc68c1b5070a83016c723623dd33b457a050e0b" ;
+    ledger:hash "sha256:cbb469ce3c7f8ecd86463976265f04ca63ea580cb9d5783e51454a1ac9904487" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-cbb469ce3c7f" .
+log:e06 a ledger:GovernanceLedgerEvent ; rdfs:label "Riverbend's coordinator rule removed from the .acl" ;
+    ledger:eventId "CH-006" ; hev:eventSequence 6 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-02T12:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d1 ;
+    ledger:governanceAction ext:Revoke ;
+    ledger:previousEventHash "sha256:cbb469ce3c7f8ecd86463976265f04ca63ea580cb9d5783e51454a1ac9904487" ;
+    ledger:hash "sha256:d619ebf4d522f373a0ce222c75e6dd6c551f48aa60884af91e0bdd51d6e86648" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-d619ebf4d522" .
+log:e07 a ledger:GovernanceLedgerEvent ; rdfs:label "Riverbend's follow-up rule added to clinical/.acl" ;
+    ledger:eventId "CH-007" ; hev:eventSequence 7 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-02T12:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d3 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:d619ebf4d522f373a0ce222c75e6dd6c551f48aa60884af91e0bdd51d6e86648" ;
+    ledger:hash "sha256:6a4b5627bb05112be95a1955e34d13e4967698e75ff74ea891e78a67ec355df7" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-6a4b5627bb05" .
+log:e08 a ledger:GovernanceLedgerEvent ; rdfs:label "Eastside's coordinator rule added to discharge-coordination/.acl" ;
+    ledger:eventId "CH-008" ; hev:eventSequence 8 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-02T12:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d4 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:6a4b5627bb05112be95a1955e34d13e4967698e75ff74ea891e78a67ec355df7" ;
+    ledger:hash "sha256:4327c11f0ea8de5e858b95c88c870892194f3912d4a493a6d6c56ffed716944f" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-4327c11f0ea8" .
+log:e09 a ledger:GovernanceLedgerEvent ; rdfs:label "Eastside re-issues Harborlight's housing tasks: locker agent adds the rule" ;
+    ledger:eventId "CH-009" ; hev:eventSequence 9 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-02T12:05:00Z"^^xsd:dateTime ;
+    ledger:actor es:agent ; ledger:delegation :d5 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:4327c11f0ea8de5e858b95c88c870892194f3912d4a493a6d6c56ffed716944f" ;
+    ledger:hash "sha256:fe394faff5148e6f849dc527bf8aa62a322be37c133f2e4f0eb95f1da46f4c0f" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:eastside-neighbors.example:agents:coordination#key-1" ;
+    ledger:signature "placeholder-signature-fe394faff514" .
+log:e10 a ledger:RuntimeLedgerEvent ; rdfs:label "Denied: coordinator delegation was revoked" ;
+    ledger:eventId "CH-010" ; hev:eventSequence 10 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-03T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capCoordinate ; ledger:action :actLateRequest ; ext:verdict "deny" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:fe394faff5148e6f849dc527bf8aa62a322be37c133f2e4f0eb95f1da46f4c0f" ;
+    ledger:hash "sha256:4c5609dd23c5612e2bc26e53c66b11c6743a2c6d427acdbf4d1fdde10732c320" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-4c5609dd23c5" .
+log:e11 a ledger:RuntimeLedgerEvent ; rdfs:label "Denied: the old Riverbend authority was revoked" ;
+    ledger:eventId "CH-011" ; hev:eventSequence 11 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-03T09:30:00Z"^^xsd:dateTime ;
+    ledger:actor hl:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capHousingTasks ; ledger:action :actStaleLease ; ext:verdict "deny" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:4c5609dd23c5612e2bc26e53c66b11c6743a2c6d427acdbf4d1fdde10732c320" ;
+    ledger:hash "sha256:1f979c9a6f23d0dbbc812bc0982e3532b46fe9777b7fa2aaf37575b252bb55e1" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:harborlight.example:agents:intake#key-1" ;
+    ledger:signature "placeholder-signature-1f979c9a6f23" .
+log:e12 a ledger:RuntimeLedgerEvent ; rdfs:label "Lease task update appended under Eastside's authority" ;
+    ledger:eventId "CH-012" ; hev:eventSequence 12 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-03T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor hl:agent ; ledger:delegation :d5 ;
+    ledger:usesCapability :capHousingTasks ; ledger:action :actLeaseTask2 ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:1f979c9a6f23d0dbbc812bc0982e3532b46fe9777b7fa2aaf37575b252bb55e1" ;
+    ledger:hash "sha256:15df4ecc3578390e7c7b9627d2b8567626bb34e63a1bf61d1afcf5dd87f0e65f" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:harborlight.example:agents:intake#key-1" ;
+    ledger:signature "placeholder-signature-15df4ecc3578" .
+log:e13 a ledger:RuntimeLedgerEvent ; rdfs:label "7-day follow-up call note appended" ;
+    ledger:eventId "CH-013" ; hev:eventSequence 13 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-10-09T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor rb:agent ; ledger:delegation :d3 ;
+    ledger:usesCapability :capFollowUp ; ledger:action :actFollowUpCall ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:15df4ecc3578390e7c7b9627d2b8567626bb34e63a1bf61d1afcf5dd87f0e65f" ;
+    ledger:hash "sha256:6919c134b2d251cd6b256b74e85d44200307506e9fdb2e6cf208ff1b937854f9" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:riverbend.example:agents:care-transitions#key-1" ;
+    ledger:signature "placeholder-signature-6919c134b2d2" .

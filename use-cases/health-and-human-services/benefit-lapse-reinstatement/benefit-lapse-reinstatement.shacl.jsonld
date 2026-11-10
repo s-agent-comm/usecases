@@ -1,0 +1,240 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#",
+      "sh:declare": [
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb1"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb2"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb3"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb4"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb5"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb6"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb7"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb8"
+        }
+      ]
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb1",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/delegation#"
+      },
+      "sh:prefix": "del"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb2",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/ledger#"
+      },
+      "sh:prefix": "ledger"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb3",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://www.w3.org/ns/ucm#"
+      },
+      "sh:prefix": "ucm"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb4",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://example.org/sac-ucm-ext#"
+      },
+      "sh:prefix": "ext"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb5",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/prov#"
+      },
+      "sh:prefix": "prov"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb6",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/auth/acl#"
+      },
+      "sh:prefix": "acl"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb7",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://purl.org/dc/terms/"
+      },
+      "sh:prefix": "dcterms"
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb8",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://w3id.org/holon/event/"
+      },
+      "sh:prefix": "hev"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#LapseIsVisibleShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": {
+        "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb15"
+      },
+      "sh:targetSubjectsOf": {
+        "@id": "ext:realizesParticipation"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb15",
+      "sh:message": "A suspension in the record must sit between the grant and the reinstatement, and match a closed UCM participation followed by a new one.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                ?s ledger:delegation $this ; ledger:governanceAction ext:Suspend ; hev:eventSequence ?sn .\n                FILTER NOT EXISTS {\n                    ?g ledger:delegation $this ; ledger:governanceAction ext:Grant ; hev:eventSequence ?gn .\n                    ?r ledger:delegation $this ; ledger:governanceAction ext:Reinstate ; hev:eventSequence ?rn ; ledger:timestamp ?rt .\n                    $this ext:realizesParticipation ?p1 , ?p2 .\n                    ?p1 ucm:validTo ?end . ?p2 ucm:validFrom ?rt .\n                    FILTER (?gn < ?sn && ?sn < ?rn && ?end < ?rt)\n                }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#PolicyStaysOutsideShape",
+      "@type": "sh:NodeShape",
+      "sh:property": {
+        "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb13"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:EligibilityRuleset"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb13",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb14"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb14",
+      "sh:inversePath": {
+        "@id": "ucm:definedByArtifact"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#TrajectoryShape",
+      "@type": "sh:NodeShape",
+      "sh:property": {
+        "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb17"
+      },
+      "sh:targetSubjectsOf": {
+        "@id": "ucm:validTo"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb17",
+      "sh:message": "A lapse needs 'after' and 'before' trajectory positions when its exact start is unknown.",
+      "sh:minCount": 2,
+      "sh:path": {
+        "@id": "ucm:hasCareTrajectoryContext"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#OrderedWithoutTimestampShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": {
+        "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb16"
+      },
+      "sh:targetClass": {
+        "@id": "ledger:GovernanceLedgerEvent"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb16",
+      "sh:message": "An event without a timestamp must still be placed by its sequence between two timestamped events.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this hev:eventSequence ?n . FILTER NOT EXISTS { $this ledger:timestamp ?t }\n                FILTER NOT EXISTS { ?a hev:eventSequence ?an ; ledger:timestamp ?at . ?b hev:eventSequence ?bn ; ledger:timestamp ?bt .\n                                    FILTER (?an < ?n && ?n < ?bn) }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/benefit-lapse-reinstatement/shapes#HouseholdShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb9"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb10"
+        },
+        {
+          "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb11"
+        }
+      ],
+      "sh:targetClass": {
+        "@id": "ucm:Household"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb9",
+      "sh:minCount": 2,
+      "sh:path": {
+        "@id": "ucm:hasMember"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb10",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:definedByCriteria"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb11",
+      "sh:message": "The household is first-class: it has its own agent.",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb12"
+      }
+    },
+    {
+      "@id": "_:n9b80e2d3517347e6b403fa0b64181c9cb12",
+      "sh:inversePath": {
+        "@id": "prov:actedOnBehalfOf"
+      }
+    }
+  ]
+}

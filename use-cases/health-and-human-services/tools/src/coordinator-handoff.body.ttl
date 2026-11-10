@@ -1,0 +1,163 @@
+@prefix : <https://example.org/sac/hhs/coordinator-handoff#> .
+
+# Use case C. Handing off the coordinator role.
+# Source: UCM discharge story, step 9 and the "roles change, people don't" criterion.
+# All people and organizations are fictional. Signatures are placeholders.
+#
+# The care coordination record lives in Delphine's Solid Pod. Handing off coordination
+# means changing the rules in that container's .acl: Riverbend's coordinator rule is
+# removed, and Eastside's is added. The .acl only shows the current rules; the
+# governance events below keep the history.
+
+@prefix dme:     <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:   <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dcoordb: <https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#> .
+@prefix dcoord:  <https://pod.example/delphine/holon/discharge-coordination/event.jsonld#> .
+@prefix dcoordacl: <https://pod.example/delphine/holon/discharge-coordination/.acl#> .
+@prefix dclinb:  <https://pod.example/delphine/holon/clinical/boundary.jsonld#> .
+@prefix dclin:   <https://pod.example/delphine/holon/clinical/event.jsonld#> .
+@prefix dclinacl: <https://pod.example/delphine/holon/clinical/.acl#> .
+@prefix log:     <https://pod.example/delphine/holon/access-log/event.jsonld#> .
+@prefix rb:      <https://riverbend.example/agents/care-transitions#> .
+@prefix hl:      <https://harborlight.example/agents/intake#> .
+@prefix es:      <https://eastside-neighbors.example/agents/coordination#> .
+
+##### Solid Pod: Delphine's personal data locker #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" .
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ;
+    dcterms:subject dme:me ; holon:contains dcoordb:holon , dclinb:holon .
+dcoordb:holon a holon:ProcessHolon ; rdfs:label "Delphine's discharge coordination" ; holon:partOf dlock:holon .
+dclinb:holon  a holon:DataHolon ;    rdfs:label "Delphine's clinical care" ;          holon:partOf dlock:holon .
+
+# Consent records. Before discharge the .acl holds riverbend-coordinator and
+# harborlight-via-riverbend; after, it holds eastside, harborlight-via-eastside,
+# and (on the clinical container) riverbend-follow-up.
+dcoordacl:riverbend-coordinator a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Append .
+dcoordacl:harborlight-via-riverbend a acl:Authorization ; acl:agent hl:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+dclinacl:riverbend-follow-up a acl:Authorization ; acl:agent rb:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/clinical/> ;
+    acl:default  <https://pod.example/delphine/holon/clinical/> ;
+    acl:mode acl:Read , acl:Append .
+dcoordacl:eastside a acl:Authorization ; acl:agent es:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Write , acl:Append .
+dcoordacl:harborlight-via-eastside a acl:Authorization ; acl:agent hl:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:default  <https://pod.example/delphine/holon/discharge-coordination/> ;
+    acl:mode acl:Read , acl:Append .
+
+##### UCM content #####
+
+:tomasz   a ucm:Person ; rdfs:label "Tomasz Brennan" ; ucm:affiliatedWith :riverbend ;
+    ucm:participatesThrough dcoord:p-tomasz-coordinator , dcoord:p-tomasz-provider .
+:samuel   a ucm:Person ; rdfs:label "Samuel Whitfield" ; ucm:affiliatedWith :eastside ;
+    ucm:participatesThrough dcoord:p-samuel-coordinator .
+:riverbend   a ucm:Organization ; rdfs:label "Riverbend General Hospital" .
+:eastside    a ucm:CommunityGroup ; rdfs:label "Eastside Neighbors" .
+:harborlight a ucm:Organization ; rdfs:label "Harborlight Housing Collaborative" .
+
+dclinb:clinical-context a ucm:ClinicalCareContext .
+dlock:social-context    a ucm:SocialCareContext ; rdfs:label "Delphine's social care" .
+dcoordb:coordinator-role a ucm:CoordinatorRole . dcoordb:provider-role a ucm:ProviderRole .
+
+dcoord:coordination a ucm:CareCoordinationInteraction ; rdfs:label "Discharge coordination" ;
+    ucm:hasActivityFocus [ a ucm:ActivityFocus ; rdfs:label "Safe discharge to stable housing" ] .
+
+# Same people, new roles. The participations end and begin when the delegations do.
+dcoord:p-tomasz-coordinator a ucm:Participation ; ucm:assumesRole dcoordb:coordinator-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dclinb:clinical-context ;
+    ucm:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ; ucm:validTo "2026-10-02T12:00:00Z"^^xsd:dateTime .
+dcoord:p-tomasz-provider a ucm:Participation ; ucm:assumesRole dcoordb:provider-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dclinb:clinical-context ;
+    ucm:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime .
+dcoord:p-samuel-coordinator a ucm:Participation ; ucm:assumesRole dcoordb:coordinator-role ;
+    ucm:occursWithin dcoord:coordination ; ucm:scopedBy dlock:social-context ;
+    ucm:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime .
+
+dcoord:open-tasks a core:Artifact , ucm:CareCoordinationStatement ;
+    rdfs:label "Open tasks at handoff: housing lease signing, 7-day follow-up call, pulse oximeter setup" ;
+    ucm:madeWithinContext dlock:social-context ; ucm:statementSubject dcoord:p-samuel-coordinator ;
+    ucm:statementDate "2026-10-02T12:00:00Z"^^xsd:dateTime .
+dcoord:lease-task-1 a core:Artifact ; rdfs:label "Lease-signing task update" .
+dcoord:lease-task-2 a core:Artifact ; rdfs:label "Lease-signing task update (under Eastside)" .
+dcoord:late-request a core:Artifact ; rdfs:label "Coordination request Riverbend tried to send after handoff" .
+dcoord:stale-lease  a core:Artifact ; rdfs:label "Lease task update Harborlight tried under Riverbend's old authority" .
+dclin:follow-up-call a core:Artifact ; rdfs:label "7-day follow-up call note" .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+rb:agent a core:Agent ; rdfs:label "Riverbend care transitions agent" ;
+    prov:actedOnBehalfOf :riverbend ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:riverbend.example:agents:care-transitions" ] .
+es:agent a core:Agent ; rdfs:label "Eastside Neighbors coordination agent" ;
+    prov:actedOnBehalfOf :eastside ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:eastside-neighbors.example:agents:coordination" ] .
+hl:agent a core:Agent ; rdfs:label "Harborlight intake agent" ;
+    prov:actedOnBehalfOf :harborlight ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:harborlight.example:agents:intake" ] .
+
+##### Capabilities #####
+
+:capCoordinate a cap:Capability ; rdfs:label "Coordinate the care team" ;
+    cap:capabilityExpression "Write requests, membership and task assignments in the discharge-coordination holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Write" .
+:capHousingTasks a cap:Capability ; rdfs:label "Work housing tasks for the team" ;
+    cap:capabilityExpression "Append housing task updates to the discharge-coordination holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+:capFollowUp a cap:Capability ; rdfs:label "Clinical follow-up" ;
+    cap:capabilityExpression "Append the 7-day follow-up note to the clinical holon" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+
+##### Delegation #####
+
+:chain a del:DelegationChain ; del:hasDelegation :d1 , :d2 , :d3 , :d4 , :d5 .
+
+:d1 a del:Delegation ; del:delegationId "C-D1" ; del:note "Riverbend coordinates (Tomasz's coordinator role)." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ; ext:realizesParticipation dcoord:p-tomasz-coordinator ;
+    ext:consentRecord dcoordacl:riverbend-coordinator ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capCoordinate , :capHousingTasks ;
+        del:validFrom "2026-09-14T09:00:00Z"^^xsd:dateTime ; del:validUntil "2026-10-02T12:00:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "C-D2" ; del:note "Riverbend brings Harborlight in for housing tasks." ;
+    del:delegatedBy rb:agent ; del:delegatesTo hl:agent ; ext:consentRecord dcoordacl:harborlight-via-riverbend ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capHousingTasks ;
+        del:validFrom "2026-09-14T11:20:00Z"^^xsd:dateTime ; del:validUntil "2026-10-02T12:00:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "C-D3" ; del:note "Riverbend stays on for the follow-up call (Tomasz's provider role)." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo rb:agent ; ext:realizesParticipation dcoord:p-tomasz-provider ;
+    ext:consentRecord dclinacl:riverbend-follow-up ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capFollowUp ;
+        del:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime ; del:validUntil "2026-10-09T12:00:00Z"^^xsd:dateTime ] .
+:d4 a del:Delegation ; del:delegationId "C-D4" ; del:note "Eastside takes over coordination (Samuel's coordinator role)." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo es:agent ; ext:realizesParticipation dcoord:p-samuel-coordinator ;
+    ext:consentRecord dcoordacl:eastside ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capCoordinate , :capHousingTasks ;
+        del:validFrom "2026-10-02T12:00:00Z"^^xsd:dateTime ] .
+:d5 a del:Delegation ; del:delegationId "C-D5" ; del:note "Eastside re-issues Harborlight's housing tasks under its own authority." ;
+    del:delegatedBy es:agent ; del:delegatesTo hl:agent ; ext:consentRecord dcoordacl:harborlight-via-eastside ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capHousingTasks ;
+        del:validFrom "2026-10-02T12:05:00Z"^^xsd:dateTime ] .
+
+##### Intent and actions: HTTP requests against Delphine's Pod #####
+
+:handoffIntent a intent:Intent ; rdfs:label "Hand coordination to the community health worker with no gap and no leftover authority" ;
+    intent:authorizedBy :d1 ; intent:producesAction :actHandoffNote .
+rb:agent core:hasIntent :handoffIntent .
+
+:actHandoffNote  a core:Action ; rdfs:label "Riverbend writes the open-task handoff note" ;                core:producesArtifact dcoord:open-tasks .
+:actLeaseTask    a core:Action ; rdfs:label "Harborlight appends a lease-signing task update" ;           core:producesArtifact dcoord:lease-task-1 .
+:actLateRequest  a core:Action ; rdfs:label "Riverbend tries to write a new coordination request after handoff" ; core:producesArtifact dcoord:late-request .
+:actFollowUpCall a core:Action ; rdfs:label "Riverbend appends the 7-day follow-up call note" ;           core:producesArtifact dclin:follow-up-call .
+:actStaleLease   a core:Action ; rdfs:label "Harborlight uses its old Riverbend authority" ;               core:producesArtifact dcoord:stale-lease .
+:actLeaseTask2   a core:Action ; rdfs:label "Harborlight appends a lease task update under Eastside's authority" ; core:producesArtifact dcoord:lease-task-2 .
+rb:agent core:executesAction :actHandoffNote , :actLateRequest , :actFollowUpCall .
+hl:agent core:executesAction :actLeaseTask , :actStaleLease , :actLeaseTask2 .
+
+:gate a core:ExecutionContext ; rdfs:label "Delphine's Pod server (JSS) enforcing Web Access Control" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, no delegation on its path is revoked or suspended, and an ACL rule grants the needed mode." ] .

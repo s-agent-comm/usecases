@@ -1,0 +1,272 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#PolicyEnforcedInPodShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": {
+        "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b18"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:PolicyDefinition"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b18",
+      "sh:message": "Each consent policy must be enforced by at least one ACL rule in Delphine's Pod (dcterms:conformsTo).",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this a ucm:PolicyDefinition .\n                FILTER NOT EXISTS { ?r a acl:Authorization ; dcterms:conformsTo $this }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#",
+      "sh:declare": [
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b1"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b2"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b3"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b4"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b5"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b6"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b7"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b8"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b9"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b10"
+        }
+      ]
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b1",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/core#"
+      },
+      "sh:prefix": "core"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b2",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/delegation#"
+      },
+      "sh:prefix": "del"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b3",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/capability#"
+      },
+      "sh:prefix": "cap"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b4",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://w3id.org/agent-ontology/ledger#"
+      },
+      "sh:prefix": "ledger"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b5",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://www.w3.org/ns/ucm#"
+      },
+      "sh:prefix": "ucm"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b6",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "https://example.org/sac-ucm-ext#"
+      },
+      "sh:prefix": "ext"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b7",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/prov#"
+      },
+      "sh:prefix": "prov"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b8",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://www.w3.org/ns/auth/acl#"
+      },
+      "sh:prefix": "acl"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b9",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://purl.org/dc/terms/"
+      },
+      "sh:prefix": "dcterms"
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b10",
+      "sh:namespace": {
+        "@type": "xsd:anyURI",
+        "@value": "http://w3id.org/holon/event/"
+      },
+      "sh:prefix": "hev"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#DenialsAreRecordedShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": {
+        "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b17"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:PolicyDefinition"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b17",
+      "sh:message": "Each consent policy should be shown at work: at least one denied request must be on the record.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#"
+      },
+      "sh:select": "\n            SELECT $this WHERE {\n                $this a ucm:PolicyDefinition .\n                FILTER NOT EXISTS { ?e ext:verdict \"deny\" }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#PantrySeesOnlyWhatWasAgreedShape",
+      "@type": "sh:NodeShape",
+      "sh:sparql": {
+        "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b16"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:CommunityGroup"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b16",
+      "sh:message": "The pantry's agent was admitted to a statement outside the Social Care context.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                ?agent prov:actedOnBehalfOf $this .\n                ?value ledger:actor ?agent ; ext:verdict \"admit\" ; ledger:action/(prov:used|core:producesArtifact) ?s .\n                ?s ucm:madeWithinContext ?ctx .\n                FILTER NOT EXISTS { ?ctx a ucm:SocialCareContext }\n            }"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#StatementShape",
+      "@type": "sh:NodeShape",
+      "sh:property": [
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b11"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b12"
+        },
+        {
+          "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b13"
+        }
+      ],
+      "sh:targetClass": [
+        {
+          "@id": "ucm:ClinicalStatement"
+        },
+        {
+          "@id": "ucm:DiagnosisStatement"
+        },
+        {
+          "@id": "ucm:CareCoordinationStatement"
+        }
+      ]
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b11",
+      "sh:maxCount": 1,
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:madeWithinContext"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b12",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:statementSubject"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b13",
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:statementDate"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#BehavioralHealthStaysInContextShape",
+      "@type": "sh:NodeShape",
+      "sh:property": {
+        "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b14"
+      },
+      "sh:sparql": {
+        "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b15"
+      },
+      "sh:targetClass": {
+        "@id": "ucm:BehavioralHealthContext"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b14",
+      "sh:class": {
+        "@id": "ucm:PolicyDefinition"
+      },
+      "sh:minCount": 1,
+      "sh:path": {
+        "@id": "ucm:definedByArtifact"
+      }
+    },
+    {
+      "@id": "_:n4cf8c2d88def4519adc43c88dcce1095b15",
+      "sh:message": "Consent limit breached: a statement in the Behavioral Health context was admitted to an agent that holds no behavioral health capability.",
+      "sh:prefixes": {
+        "@id": "https://example.org/sac/hhs/consent-scoped-sharing/shapes#"
+      },
+      "sh:select": "\n            SELECT $this ?value WHERE {\n                ?s ucm:madeWithinContext $this .\n                ?value ledger:action/(prov:used|core:producesArtifact) ?s ; ext:verdict \"admit\" ; ledger:actor ?who .\n                FILTER NOT EXISTS { ?d del:delegatesTo ?who ; del:delegationScope/del:allowedCapability ?c .\n                                    ?c cap:hasConstraint/cap:allowedContext \"https://www.w3.org/ns/ucm#BehavioralHealthContext\" }\n            }"
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://w3id.org/agent-ontology/core#> .
+@prefix agent: <https://w3id.org/agent-ontology/agent#> .
+@prefix id:   <https://w3id.org/agent-ontology/identity#> .
+@prefix del:  <https://w3id.org/agent-ontology/delegation#> .
+@prefix cap:  <https://w3id.org/agent-ontology/capability#> .
+@prefix intent: <https://w3id.org/agent-ontology/intent#> .
+@prefix ledger: <https://w3id.org/agent-ontology/ledger#> .
+@prefix sec:  <https://w3id.org/agent-ontology/security-binding#> .
+@prefix ucm:  <https://www.w3.org/ns/ucm#> .
+@prefix ext:  <https://example.org/sac-ucm-ext#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix acl:  <http://www.w3.org/ns/auth/acl#> .
+@prefix holon: <http://w3id.org/holon/> .
+@prefix hev:  <http://w3id.org/holon/event/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix : <https://example.org/sac/hhs/benefit-lapse-reinstatement#> .
+
+# Use case D. Benefit lapse and reinstatement.
+# Source: UCM nutrition story, steps 6 to 11 and the "a lapse is visible" criterion.
+# All people, organizations and programs are fictional. Signatures are placeholders.
+#
+# Three Solid Pods: Delphine's (her benefits holon), Jules's (his income holon), and one
+# for the household as a group, which keeps the benefit log. The county reads income
+# and writes the eligibility result only where an ACL rule in the owner's Pod allows it.
+
+@prefix dme:    <https://pod.example/delphine/profile/card.jsonld#> .
+@prefix dlock:  <https://pod.example/delphine/holon/boundary.jsonld#> .
+@prefix dbenb:  <https://pod.example/delphine/holon/benefits/boundary.jsonld#> .
+@prefix dben:   <https://pod.example/delphine/holon/benefits/event.jsonld#> .
+@prefix dbenacl: <https://pod.example/delphine/holon/benefits/.acl#> .
+@prefix jme:    <https://pod.example/jules/profile/card.jsonld#> .
+@prefix jlock:  <https://pod.example/jules/holon/boundary.jsonld#> .
+@prefix jincb:  <https://pod.example/jules/holon/income/boundary.jsonld#> .
+@prefix jinc:   <https://pod.example/jules/holon/income/event.jsonld#> .
+@prefix jincacl: <https://pod.example/jules/holon/income/.acl#> .
+@prefix hme:    <https://pod.example/arceneaux-household/profile/card.jsonld#> .
+@prefix hlock:  <https://pod.example/arceneaux-household/holon/boundary.jsonld#> .
+@prefix log:    <https://pod.example/arceneaux-household/holon/benefit-log/event.jsonld#> .
+@prefix county: <https://bramble-county.example/agents/benefits#> .
+
+##### Solid Pods #####
+
+dme:me a ucm:Person ; rdfs:label "Delphine Arceneaux" ; ucm:hasMembership hlock:m-delphine ;
+    ucm:participatesThrough dben:p-client , dben:benefit-1 , dben:benefit-2 .
+jme:me a ucm:Person ; rdfs:label "Jules Arceneaux" ; ucm:hasMembership hlock:m-jules ;
+    ucm:participatesThrough jinc:p-client .
+
+dlock:holon a holon:AgentHolon ; rdfs:label "Delphine's personal data locker" ; dcterms:subject dme:me ; holon:contains dbenb:holon .
+dbenb:holon a holon:ProcessHolon ; rdfs:label "Delphine's food benefit" ; holon:partOf dlock:holon .
+jlock:holon a holon:AgentHolon ; rdfs:label "Jules's personal data locker" ; dcterms:subject jme:me ; holon:contains jincb:holon .
+jincb:holon a holon:DataHolon ; rdfs:label "Jules's income" ; holon:partOf jlock:holon .
+hlock:holon a holon:AgentHolon ; rdfs:label "Household data locker" ; dcterms:subject hme:us .
+
+# Consent records. Each person consents in their own Pod.
+dbenacl:county a acl:Authorization ; acl:agent county:agent ;
+    acl:accessTo <https://pod.example/delphine/holon/benefits/> ;
+    acl:default  <https://pod.example/delphine/holon/benefits/> ;
+    acl:mode acl:Read , acl:Append .
+jincacl:county a acl:Authorization ; acl:agent county:agent ;
+    acl:accessTo <https://pod.example/jules/holon/income/> ;
+    acl:default  <https://pod.example/jules/holon/income/> ;
+    acl:mode acl:Read .
+
+##### UCM content #####
+
+:county a ucm:Organization ; rdfs:label "Bramble County Department of Human Services" .
+
+hme:us a ucm:Household ; rdfs:label "Delphine and Jules's grocery unit" ;
+    ucm:hasMember dme:me , jme:me ; ucm:definedByCriteria hlock:buys-together .
+hlock:buys-together a ucm:MembershipCriteria ; rdfs:label "Buy and prepare food together" .
+hlock:m-delphine a ucm:Membership ; ucm:membershipIn hme:us .
+hlock:m-jules    a ucm:Membership ; ucm:membershipIn hme:us .
+
+dbenb:fresh-plate a ucm:ProgramDefinition ; rdfs:label "FreshPlate Food Benefit (fictional)" .
+dbenb:fresh-plate-rules a ucm:EligibilityRuleset ; rdfs:label "FreshPlate eligibility rules. The income limit lives in the implementation model, not here." .
+dbenb:social-context a ucm:SocialCareContext ; ucm:definedByArtifact dbenb:fresh-plate-rules .
+dbenb:client-role a ucm:ClientRole . dbenb:beneficiary-role a ucm:BeneficiaryRole .
+
+dben:determination a ucm:EligibilityDetermination ; rdfs:label "FreshPlate eligibility determination" .
+dben:p-client a ucm:Participation ; ucm:assumesRole dbenb:client-role ; ucm:occursWithin dben:determination ; ucm:scopedBy dbenb:social-context .
+jinc:p-client a ucm:Participation ; ucm:assumesRole dbenb:client-role ; ucm:occursWithin dben:determination ; ucm:scopedBy dbenb:social-context .
+
+jinc:wages a ucm:SocialCareStatement , core:Artifact ; rdfs:label "Household income: Jules's warehouse wages (pay stubs)" ;
+    ucm:madeWithinContext dbenb:social-context ; ucm:statementSubject jinc:p-client ;
+    ucm:statementDate "2026-11-12T10:00:00Z"^^xsd:dateTime .
+dben:eligible a ucm:SocialCareStatement , core:Artifact ; rdfs:label "Household is eligible for FreshPlate" ;
+    ucm:madeWithinContext dbenb:social-context ; ucm:statementSubject dben:p-client ;
+    ucm:statementDate "2026-11-17T10:00:00Z"^^xsd:dateTime .
+
+# The UCM workaround: one participation closes, another opens. (UCM gives lifecycle state only to processes.)
+dben:benefit-1 a ucm:Participation ; ucm:assumesRole dbenb:beneficiary-role ; ucm:scopedBy dbenb:social-context ;
+    ucm:validFrom "2026-11-17T10:00:00Z"^^xsd:dateTime ; ucm:validTo "2027-04-30T00:00:00Z"^^xsd:dateTime .
+dben:benefit-2 a ucm:Participation ; ucm:assumesRole dbenb:beneficiary-role ; ucm:scopedBy dbenb:social-context ;
+    ucm:validFrom "2027-05-21T10:00:00Z"^^xsd:dateTime .
+
+# Order without timestamps: the lapse sits after the recertification due date and before Samuel notices.
+dbenb:after-recert-due a ucm:CareTrajectoryContext ; rdfs:label "After the recertification due date" .
+dbenb:before-noticed   a ucm:CareTrajectoryContext ; rdfs:label "Before the coordinator notices the suspension" .
+dben:benefit-1 ucm:hasCareTrajectoryContext dbenb:after-recert-due , dbenb:before-noticed .
+
+##### Agents #####
+
+dlock:locker-agent a core:Agent ; rdfs:label "Delphine's locker agent" ;
+    prov:actedOnBehalfOf dme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:delphine" ] .
+jlock:locker-agent a core:Agent ; rdfs:label "Jules's locker agent" ;
+    prov:actedOnBehalfOf jme:me ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:jules" ] .
+hlock:locker-agent a core:Agent ; rdfs:label "Household locker agent" ;
+    prov:actedOnBehalfOf hme:us ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:pod.example:arceneaux-household" ] .
+county:agent a core:Agent ; rdfs:label "Bramble County DHS benefits agent" ;
+    prov:actedOnBehalfOf :county ; agent:hasIdentity [ a id:AgentIdentity ; id:did "did:web:bramble-county.example:agents:benefits" ] .
+
+##### Capabilities #####
+
+:capReadIncome a cap:Capability ; rdfs:label "Read household income statements" ;
+    cap:capabilityExpression "GET ucm:SocialCareStatement about household income" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Read" ;
+    cap:hasConstraint [ a cap:CapabilityConstraint ; cap:allowedContext "https://www.w3.org/ns/ucm#SocialCareContext" ] .
+:capDetermine a cap:Capability ; rdfs:label "Record a FreshPlate eligibility result" ;
+    cap:capabilityExpression "Append a ucm:SocialCareStatement under :fresh-plate-rules" ;
+    cap:requiresPermission "http://www.w3.org/ns/auth/acl#Append" .
+:capNotify a cap:Capability ; rdfs:label "Send program notices" ;
+    cap:capabilityExpression "Send recertification and other notices by mail" .
+:capRedeem a cap:Capability ; rdfs:label "Redeem FreshPlate benefit" ;
+    cap:capabilityExpression "Pick up a FreshPlate box at the pantry" .
+
+##### Delegation #####
+
+# Consent chains: each person consents for their own data, in their own Pod.
+:consentDelphine a del:DelegationChain ; del:hasDelegation :d1 .
+:consentJules    a del:DelegationChain ; del:hasDelegation :d2 .
+# Benefit chain: the county grants the benefit to the household, which lets Jules pick up.
+# Nothing in it touches a Pod, so it needs no consent record.
+:benefitChain    a del:DelegationChain ; del:hasDelegation :d3 , :d4 .
+
+:d1 a del:Delegation ; del:delegationId "D-D1" ; del:note "Delphine consents to the county reading her benefits holon and appending the result." ;
+    del:delegatedBy dlock:locker-agent ; del:delegatesTo county:agent ; ext:consentRecord dbenacl:county ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capReadIncome , :capDetermine , :capNotify ;
+        del:validFrom "2026-11-10T09:00:00Z"^^xsd:dateTime ] .
+:d2 a del:Delegation ; del:delegationId "D-D2" ; del:note "Jules consents to the county reading his wages. He counts as household, not as a patient." ;
+    del:delegatedBy jlock:locker-agent ; del:delegatesTo county:agent ; ext:consentRecord jincacl:county ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capReadIncome ;
+        del:validFrom "2026-11-10T09:05:00Z"^^xsd:dateTime ] .
+:d3 a del:Delegation ; del:delegationId "D-D3" ; del:note "The county grants FreshPlate to the household." ;
+    del:delegatedBy county:agent ; del:delegatesTo hlock:locker-agent ;
+    ext:realizesParticipation dben:benefit-1 , dben:benefit-2 ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capRedeem ;
+        del:validFrom "2026-11-17T10:00:00Z"^^xsd:dateTime ] .
+:d4 a del:Delegation ; del:delegationId "D-D4" ; del:note "The household lets Jules, the caregiver, pick up the box." ;
+    del:delegatedBy hlock:locker-agent ; del:delegatesTo jlock:locker-agent ;
+    del:delegationScope [ a del:DelegationScope ; del:allowedCapability :capRedeem ;
+        del:validFrom "2026-11-17T10:05:00Z"^^xsd:dateTime ] .
+
+##### Intent and actions #####
+
+:steadyMealsIntent a intent:Intent ; rdfs:label "Keep the household's food benefit continuous" ;
+    intent:authorizedBy :d3 ; intent:producesAction :actPickup1 , :actPickupLapsed , :actPickup2 .
+hlock:locker-agent core:hasIntent :steadyMealsIntent .
+
+:actReadWages      a core:Action ; rdfs:label "County reads Jules's wages from his Pod" ; prov:used jinc:wages .
+:actDetermine      a core:Action ; rdfs:label "County appends the eligibility result to Delphine's Pod" ; core:producesArtifact dben:eligible .
+:actPickup1        a core:Action ; rdfs:label "Jules picks up a FreshPlate box" .
+:actRecertNotice   a core:Action ; rdfs:label "County sends a recertification notice (to the old address)" .
+:actPickupLapsed   a core:Action ; rdfs:label "Jules tries to pick up a box during the lapse" .
+:actReadWages2     a core:Action ; rdfs:label "County reads Jules's new pay stubs from his Pod" ; prov:used jinc:wages .
+:actPickup2        a core:Action ; rdfs:label "Jules picks up a box after reinstatement" .
+county:agent       core:executesAction :actReadWages , :actDetermine , :actRecertNotice , :actReadWages2 .
+jlock:locker-agent core:executesAction :actPickup1 , :actPickupLapsed , :actPickup2 .
+
+:gate a core:ExecutionContext ; rdfs:label "Authorization gate: the county benefit system, and the Pod servers for Pod data" ;
+    sec:hasAccessControlRule [ a sec:AccessControlRule ;
+        sec:allowedAction "Admit only if the actor is the delegate, the capability is in scope, no delegation on its path is revoked or suspended, and, for Pod data, an ACL rule grants the mode." ] .
+
+##### Execution record: append-only, hash-chained, signed #####
+
+log:e01 a ledger:GovernanceLedgerEvent ; rdfs:label "Delphine consents: rule for the county added to benefits/.acl" ;
+    ledger:eventId "BLR-001" ; hev:eventSequence 1 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-10T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor dlock:locker-agent ; ledger:delegation :d1 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:hash "sha256:6c11fc13b2a5ffe1c5284f80a640e40ccfe125e4434e795be94979b5fb20ac39" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:delphine#key-1" ;
+    ledger:signature "placeholder-signature-6c11fc13b2a5" .
+log:e02 a ledger:GovernanceLedgerEvent ; rdfs:label "Jules consents: rule for the county added to income/.acl" ;
+    ledger:eventId "BLR-002" ; hev:eventSequence 2 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-10T09:05:00Z"^^xsd:dateTime ;
+    ledger:actor jlock:locker-agent ; ledger:delegation :d2 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:6c11fc13b2a5ffe1c5284f80a640e40ccfe125e4434e795be94979b5fb20ac39" ;
+    ledger:hash "sha256:9055c26f8224148c38aa1b3fc45b140f3b196c09d49f5347a704d92da968699f" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:jules#key-1" ;
+    ledger:signature "placeholder-signature-9055c26f8224" .
+log:e03 a ledger:RuntimeLedgerEvent ; rdfs:label "County reads Jules's wages from his Pod" ;
+    ledger:eventId "BLR-003" ; hev:eventSequence 3 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-12T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor county:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capReadIncome ; ledger:action :actReadWages ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:9055c26f8224148c38aa1b3fc45b140f3b196c09d49f5347a704d92da968699f" ;
+    ledger:hash "sha256:ab699691921f293e8117fcf15a7cdbfade845eceb7c779d62fc3f59af03f8deb" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-ab699691921f" .
+log:e04 a ledger:RuntimeLedgerEvent ; rdfs:label "Eligibility result appended to Delphine's Pod" ;
+    ledger:eventId "BLR-004" ; hev:eventSequence 4 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-17T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor county:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capDetermine ; ledger:action :actDetermine ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:ab699691921f293e8117fcf15a7cdbfade845eceb7c779d62fc3f59af03f8deb" ;
+    ledger:hash "sha256:7bff5f6021fc8dab361ce579aaf1a87f6b70a04236c24d84bcea2ef5cb540904" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-7bff5f6021fc" .
+log:e05 a ledger:GovernanceLedgerEvent ; rdfs:label "FreshPlate granted to the household" ;
+    ledger:eventId "BLR-005" ; hev:eventSequence 5 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-17T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor county:agent ; ledger:delegation :d3 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:7bff5f6021fc8dab361ce579aaf1a87f6b70a04236c24d84bcea2ef5cb540904" ;
+    ledger:hash "sha256:fa6305ce8b238b712801421fbd0b91ec843563e77682e1ea0799aa9af2adb3cc" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-fa6305ce8b23" .
+log:e06 a ledger:GovernanceLedgerEvent ; rdfs:label "Jules may pick up for the household" ;
+    ledger:eventId "BLR-006" ; hev:eventSequence 6 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-17T10:05:00Z"^^xsd:dateTime ;
+    ledger:actor hlock:locker-agent ; ledger:delegation :d4 ;
+    ledger:governanceAction ext:Grant ;
+    ledger:previousEventHash "sha256:fa6305ce8b238b712801421fbd0b91ec843563e77682e1ea0799aa9af2adb3cc" ;
+    ledger:hash "sha256:05f50da51a4b7846e37a7d6e7881911129f496fc3b936d6b7c05f34f56e11465" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:arceneaux-household#key-1" ;
+    ledger:signature "placeholder-signature-05f50da51a4b" .
+log:e07 a ledger:RuntimeLedgerEvent ; rdfs:label "First Tuesday pickup" ;
+    ledger:eventId "BLR-007" ; hev:eventSequence 7 ; ledger:appendOnly true ;
+    ledger:timestamp "2026-11-24T17:00:00Z"^^xsd:dateTime ;
+    ledger:actor jlock:locker-agent ; ledger:delegation :d4 ;
+    ledger:usesCapability :capRedeem ; ledger:action :actPickup1 ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:05f50da51a4b7846e37a7d6e7881911129f496fc3b936d6b7c05f34f56e11465" ;
+    ledger:hash "sha256:3368d91e73d7b74b9a0de4f8a403aab1c2e5f6244cdcd6c64a7112ac908c58fa" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:jules#key-1" ;
+    ledger:signature "placeholder-signature-3368d91e73d7" .
+log:e08 a ledger:RuntimeLedgerEvent ; rdfs:label "Recertification notice sent to the old address" ;
+    ledger:eventId "BLR-008" ; hev:eventSequence 8 ; ledger:appendOnly true ;
+    ledger:timestamp "2027-04-01T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor county:agent ; ledger:delegation :d1 ;
+    ledger:usesCapability :capNotify ; ledger:action :actRecertNotice ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:3368d91e73d7b74b9a0de4f8a403aab1c2e5f6244cdcd6c64a7112ac908c58fa" ;
+    ledger:hash "sha256:fcc8958e4cb34200ed3b749a11a5181c969a5cffea54d0d3c9b4ae7bae6ca194" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-fcc8958e4cb3" .
+log:e09 a ledger:GovernanceLedgerEvent ; rdfs:label "Benefit suspended for missed recertification (exact day unknown)" ;
+    ledger:eventId "BLR-009" ; hev:eventSequence 9 ; ledger:appendOnly true ;
+    ledger:actor county:agent ; ledger:delegation :d3 ;
+    ledger:governanceAction ext:Suspend ;
+    ledger:previousEventHash "sha256:fcc8958e4cb34200ed3b749a11a5181c969a5cffea54d0d3c9b4ae7bae6ca194" ;
+    ledger:hash "sha256:06340d9a5726186e4f679767c9c7edcc846e9d62bb2112fdd630d51d5a48a732" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-06340d9a5726" .
+log:e10 a ledger:RuntimeLedgerEvent ; rdfs:label "Denied: the household's benefit is suspended" ;
+    ledger:eventId "BLR-010" ; hev:eventSequence 10 ; ledger:appendOnly true ;
+    ledger:timestamp "2027-05-18T17:00:00Z"^^xsd:dateTime ;
+    ledger:actor jlock:locker-agent ; ledger:delegation :d4 ;
+    ledger:usesCapability :capRedeem ; ledger:action :actPickupLapsed ; ext:verdict "deny" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:06340d9a5726186e4f679767c9c7edcc846e9d62bb2112fdd630d51d5a48a732" ;
+    ledger:hash "sha256:7a1ac7d19dc29298ff23ac2a785e2536777c0636dd75fb887b85c5d52177e340" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:jules#key-1" ;
+    ledger:signature "placeholder-signature-7a1ac7d19dc2" .
+log:e11 a ledger:RuntimeLedgerEvent ; rdfs:label "County reads Jules's new pay stubs from his Pod" ;
+    ledger:eventId "BLR-011" ; hev:eventSequence 11 ; ledger:appendOnly true ;
+    ledger:timestamp "2027-05-21T09:00:00Z"^^xsd:dateTime ;
+    ledger:actor county:agent ; ledger:delegation :d2 ;
+    ledger:usesCapability :capReadIncome ; ledger:action :actReadWages2 ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:7a1ac7d19dc29298ff23ac2a785e2536777c0636dd75fb887b85c5d52177e340" ;
+    ledger:hash "sha256:4914b912a8b81975100a7af143d4c756c42ad0b83da3a935ef3e6315431ea337" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-4914b912a8b8" .
+log:e12 a ledger:GovernanceLedgerEvent ; rdfs:label "Benefit reinstated" ;
+    ledger:eventId "BLR-012" ; hev:eventSequence 12 ; ledger:appendOnly true ;
+    ledger:timestamp "2027-05-21T10:00:00Z"^^xsd:dateTime ;
+    ledger:actor county:agent ; ledger:delegation :d3 ;
+    ledger:governanceAction ext:Reinstate ;
+    ledger:previousEventHash "sha256:4914b912a8b81975100a7af143d4c756c42ad0b83da3a935ef3e6315431ea337" ;
+    ledger:hash "sha256:2ee39b8b06106a7ecde4987792df39869d15edc1fbc7631d5f28e7b07ada0d61" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:bramble-county.example:agents:benefits#key-1" ;
+    ledger:signature "placeholder-signature-2ee39b8b0610" .
+log:e13 a ledger:RuntimeLedgerEvent ; rdfs:label "Pickups resume" ;
+    ledger:eventId "BLR-013" ; hev:eventSequence 13 ; ledger:appendOnly true ;
+    ledger:timestamp "2027-05-25T17:00:00Z"^^xsd:dateTime ;
+    ledger:actor jlock:locker-agent ; ledger:delegation :d4 ;
+    ledger:usesCapability :capRedeem ; ledger:action :actPickup2 ; ext:verdict "admit" ;
+    ledger:executionContext :gate ;
+    ledger:previousEventHash "sha256:2ee39b8b06106a7ecde4987792df39869d15edc1fbc7631d5f28e7b07ada0d61" ;
+    ledger:hash "sha256:2e95a381d69d068407e2d06fe277b6ff7b34594266220dd6e822333fd672a8be" ;
+    ledger:proofType "DataIntegrityProof" ; ledger:publicKey "did:web:pod.example:jules#key-1" ;
+    ledger:signature "placeholder-signature-2e95a381d69d" .

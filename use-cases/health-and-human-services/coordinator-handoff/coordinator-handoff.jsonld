@@ -1,0 +1,1100 @@
+{
+  "@context": {
+    "acl": "http://www.w3.org/ns/auth/acl#",
+    "agent": "https://w3id.org/agent-ontology/agent#",
+    "cap": "https://w3id.org/agent-ontology/capability#",
+    "core": "https://w3id.org/agent-ontology/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "del": "https://w3id.org/agent-ontology/delegation#",
+    "ext": "https://example.org/sac-ucm-ext#",
+    "hev": "http://w3id.org/holon/event/",
+    "holon": "http://w3id.org/holon/",
+    "id": "https://w3id.org/agent-ontology/identity#",
+    "intent": "https://w3id.org/agent-ontology/intent#",
+    "ledger": "https://w3id.org/agent-ontology/ledger#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sec": "https://w3id.org/agent-ontology/security-binding#",
+    "sh": "http://www.w3.org/ns/shacl#",
+    "ucm": "https://www.w3.org/ns/ucm#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/.acl#riverbend-follow-up",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/clinical/"
+      },
+      "acl:agent": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/clinical/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#harborlight-via-riverbend",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#chain",
+      "@type": "del:DelegationChain",
+      "del:hasDelegation": [
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#d1"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#d2"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#d3"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#d4"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#d5"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-tomasz-provider",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#provider-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#clinical-context"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e03",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 3,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actLeaseTask"
+      },
+      "ledger:actor": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d2"
+      },
+      "ledger:eventId": "CH-003",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#gate"
+      },
+      "ledger:hash": "sha256:60a3647c27dd6c984093206f3dcb4a09f0ff70c43d0ba4cbd6ccd69aa4ecd58a",
+      "ledger:previousEventHash": "sha256:db8f2c959d81fdf017248f722ec57d7628e4bc008ec486a76d399354b3ea8148",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:harborlight.example:agents:intake#key-1",
+      "ledger:signature": "placeholder-signature-60a3647c27dd",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-30T10:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+      },
+      "rdfs:label": "Lease-signing task update appended"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e02",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 2,
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d2"
+      },
+      "ledger:eventId": "CH-002",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:db8f2c959d81fdf017248f722ec57d7628e4bc008ec486a76d399354b3ea8148",
+      "ledger:previousEventHash": "sha256:66f9f9691b66e3d8690d591907b4c459a30e660c7f09a4c2e49e948761472d68",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-db8f2c959d81",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T11:20:00+00:00"
+      },
+      "rdfs:label": "Harborlight joins for housing tasks: locker agent adds its rule at Riverbend's request"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e10",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "deny",
+      "hev:eventSequence": 10,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actLateRequest"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d1"
+      },
+      "ledger:eventId": "CH-010",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#gate"
+      },
+      "ledger:hash": "sha256:4c5609dd23c5612e2bc26e53c66b11c6743a2c6d427acdbf4d1fdde10732c320",
+      "ledger:previousEventHash": "sha256:fe394faff5148e6f849dc527bf8aa62a322be37c133f2e4f0eb95f1da46f4c0f",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-4c5609dd23c5",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-03T09:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capCoordinate"
+      },
+      "rdfs:label": "Denied: coordinator delegation was revoked"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e12",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 12,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actLeaseTask2"
+      },
+      "ledger:actor": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d5"
+      },
+      "ledger:eventId": "CH-012",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#gate"
+      },
+      "ledger:hash": "sha256:15df4ecc3578390e7c7b9627d2b8567626bb34e63a1bf61d1afcf5dd87f0e65f",
+      "ledger:previousEventHash": "sha256:1f979c9a6f23d0dbbc812bc0982e3532b46fe9777b7fa2aaf37575b252bb55e1",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:harborlight.example:agents:intake#key-1",
+      "ledger:signature": "placeholder-signature-15df4ecc3578",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-03T10:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+      },
+      "rdfs:label": "Lease task update appended under Eastside's authority"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#samuel",
+      "@type": "ucm:Person",
+      "rdfs:label": "Samuel Whitfield",
+      "ucm:affiliatedWith": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#eastside"
+      },
+      "ucm:participatesThrough": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-samuel-coordinator"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e08",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 8,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d4"
+      },
+      "ledger:eventId": "CH-008",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:4327c11f0ea8de5e858b95c88c870892194f3912d4a493a6d6c56ffed716944f",
+      "ledger:previousEventHash": "sha256:6a4b5627bb05112be95a1955e34d13e4967698e75ff74ea891e78a67ec355df7",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-4327c11f0ea8",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      },
+      "rdfs:label": "Eastside's coordinator rule added to discharge-coordination/.acl"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#actHandoffNote",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#open-tasks"
+      },
+      "rdfs:label": "Riverbend writes the open-task handoff note"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#late-request",
+      "@type": "core:Artifact",
+      "rdfs:label": "Coordination request Riverbend tried to send after handoff"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Append housing task updates to the discharge-coordination holon",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Append",
+      "rdfs:label": "Work housing tasks for the team"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#actLeaseTask",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#lease-task-1"
+      },
+      "rdfs:label": "Harborlight appends a lease-signing task update"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#stale-lease",
+      "@type": "core:Artifact",
+      "rdfs:label": "Lease task update Harborlight tried under Riverbend's old authority"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#holon",
+      "@type": "holon:DataHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's clinical care"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb2"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "rdfs:label": "Delphine's locker agent"
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb2",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:pod.example:delphine"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#eastside",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://eastside-neighbors.example/agents/coordination#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Write"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#capCoordinate",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Write requests, membership and task assignments in the discharge-coordination holon",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Write",
+      "rdfs:label": "Coordinate the care team"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#eastside",
+      "@type": "ucm:CommunityGroup",
+      "rdfs:label": "Eastside Neighbors"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#d5",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://eastside-neighbors.example/agents/coordination#agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "del:delegationId": "C-D5",
+      "del:delegationScope": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb10"
+      },
+      "del:note": "Eastside re-issues Harborlight's housing tasks under its own authority.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#harborlight-via-eastside"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb10",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:05:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#actFollowUpCall",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#follow-up-call"
+      },
+      "rdfs:label": "Riverbend appends the 7-day follow-up call note"
+    },
+    {
+      "@id": "https://riverbend.example/agents/care-transitions#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb3"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#actHandoffNote"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#actLateRequest"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#actFollowUpCall"
+        }
+      ],
+      "core:hasIntent": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#handoffIntent"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#riverbend"
+      },
+      "rdfs:label": "Riverbend care transitions agent"
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb3",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:riverbend.example:agents:care-transitions"
+    },
+    {
+      "@id": "https://eastside-neighbors.example/agents/coordination#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb4"
+      },
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#eastside"
+      },
+      "rdfs:label": "Eastside Neighbors coordination agent"
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb4",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:eastside-neighbors.example:agents:coordination"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e13",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 13,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actFollowUpCall"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d3"
+      },
+      "ledger:eventId": "CH-013",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#gate"
+      },
+      "ledger:hash": "sha256:6919c134b2d251cd6b256b74e85d44200307506e9fdb2e6cf208ff1b937854f9",
+      "ledger:previousEventHash": "sha256:15df4ecc3578390e7c7b9627d2b8567626bb34e63a1bf61d1afcf5dd87f0e65f",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-6919c134b2d2",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-09T10:00:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capFollowUp"
+      },
+      "rdfs:label": "7-day follow-up call note appended"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#lease-task-2",
+      "@type": "core:Artifact",
+      "rdfs:label": "Lease-signing task update (under Eastside)"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context",
+      "@type": "ucm:SocialCareContext",
+      "rdfs:label": "Delphine's social care"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/event.jsonld#follow-up-call",
+      "@type": "core:Artifact",
+      "rdfs:label": "7-day follow-up call note"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#actLeaseTask2",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#lease-task-2"
+      },
+      "rdfs:label": "Harborlight appends a lease task update under Eastside's authority"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#riverbend-coordinator",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Write"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#actLateRequest",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#late-request"
+      },
+      "rdfs:label": "Riverbend tries to write a new coordination request after handoff"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#actStaleLease",
+      "@type": "core:Action",
+      "core:producesArtifact": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#stale-lease"
+      },
+      "rdfs:label": "Harborlight uses its old Riverbend authority"
+    },
+    {
+      "@id": "https://harborlight.example/agents/intake#agent",
+      "@type": "core:Agent",
+      "agent:hasIdentity": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb5"
+      },
+      "core:executesAction": [
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#actLeaseTask"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#actStaleLease"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#actLeaseTask2"
+        }
+      ],
+      "prov:actedOnBehalfOf": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#harborlight"
+      },
+      "rdfs:label": "Harborlight intake agent"
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb5",
+      "@type": "id:AgentIdentity",
+      "id:did": "did:web:harborlight.example:agents:intake"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#d4",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://eastside-neighbors.example/agents/coordination#agent"
+      },
+      "del:delegationId": "C-D4",
+      "del:delegationScope": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb9"
+      },
+      "del:note": "Eastside takes over coordination (Samuel's coordinator role).",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#eastside"
+      },
+      "ext:realizesParticipation": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-samuel-coordinator"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb9",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": [
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#capCoordinate"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+        }
+      ],
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon",
+      "@type": "holon:AgentHolon",
+      "dcterms:subject": {
+        "@id": "https://pod.example/delphine/profile/card.jsonld#me"
+      },
+      "holon:contains": [
+        {
+          "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#holon"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#holon"
+        }
+      ],
+      "rdfs:label": "Delphine's personal data locker"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#harborlight",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Harborlight Housing Collaborative"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#harborlight-via-eastside",
+      "@type": "acl:Authorization",
+      "acl:accessTo": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:agent": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "acl:default": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/"
+      },
+      "acl:mode": [
+        {
+          "@id": "acl:Read"
+        },
+        {
+          "@id": "acl:Append"
+        }
+      ]
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e04",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "admit",
+      "hev:eventSequence": 4,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actHandoffNote"
+      },
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d1"
+      },
+      "ledger:eventId": "CH-004",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#gate"
+      },
+      "ledger:hash": "sha256:021e0aaaa08ed0b08a7994874fc68c1b5070a83016c723623dd33b457a050e0b",
+      "ledger:previousEventHash": "sha256:60a3647c27dd6c984093206f3dcb4a09f0ff70c43d0ba4cbd6ccd69aa4ecd58a",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-021e0aaaa08e",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T11:50:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capCoordinate"
+      },
+      "rdfs:label": "Open-task handoff note written"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#holon",
+      "@type": "holon:ProcessHolon",
+      "holon:partOf": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#holon"
+      },
+      "rdfs:label": "Delphine's discharge coordination"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#provider-role",
+      "@type": "ucm:ProviderRole"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#riverbend",
+      "@type": "ucm:Organization",
+      "rdfs:label": "Riverbend General Hospital"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#lease-task-1",
+      "@type": "core:Artifact",
+      "rdfs:label": "Lease-signing task update"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e01",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 1,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d1"
+      },
+      "ledger:eventId": "CH-001",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:66f9f9691b66e3d8690d591907b4c459a30e660c7f09a4c2e49e948761472d68",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-66f9f9691b66",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      },
+      "rdfs:label": "Riverbend becomes coordinator: rule added to discharge-coordination/.acl"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#gate",
+      "@type": "core:ExecutionContext",
+      "rdfs:label": "Delphine's Pod server (JSS) enforcing Web Access Control",
+      "sec:hasAccessControlRule": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb11"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb11",
+      "@type": "sec:AccessControlRule",
+      "sec:allowedAction": "Admit only if the actor is the delegate, the capability is in scope, no delegation on its path is revoked or suspended, and an ACL rule grants the needed mode."
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e05",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 5,
+      "ledger:actor": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d2"
+      },
+      "ledger:eventId": "CH-005",
+      "ledger:governanceAction": {
+        "@id": "ext:Revoke"
+      },
+      "ledger:hash": "sha256:cbb469ce3c7f8ecd86463976265f04ca63ea580cb9d5783e51454a1ac9904487",
+      "ledger:previousEventHash": "sha256:021e0aaaa08ed0b08a7994874fc68c1b5070a83016c723623dd33b457a050e0b",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:riverbend.example:agents:care-transitions#key-1",
+      "ledger:signature": "placeholder-signature-cbb469ce3c7f",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      },
+      "rdfs:label": "Riverbend withdraws Harborlight's authority: locker agent removes the rule"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e11",
+      "@type": "ledger:RuntimeLedgerEvent",
+      "ext:verdict": "deny",
+      "hev:eventSequence": 11,
+      "ledger:action": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actStaleLease"
+      },
+      "ledger:actor": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d2"
+      },
+      "ledger:eventId": "CH-011",
+      "ledger:executionContext": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#gate"
+      },
+      "ledger:hash": "sha256:1f979c9a6f23d0dbbc812bc0982e3532b46fe9777b7fa2aaf37575b252bb55e1",
+      "ledger:previousEventHash": "sha256:4c5609dd23c5612e2bc26e53c66b11c6743a2c6d427acdbf4d1fdde10732c320",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:harborlight.example:agents:intake#key-1",
+      "ledger:signature": "placeholder-signature-1f979c9a6f23",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-03T09:30:00+00:00"
+      },
+      "ledger:usesCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+      },
+      "rdfs:label": "Denied: the old Riverbend authority was revoked"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e09",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 9,
+      "ledger:actor": {
+        "@id": "https://eastside-neighbors.example/agents/coordination#agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d5"
+      },
+      "ledger:eventId": "CH-009",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:fe394faff5148e6f849dc527bf8aa62a322be37c133f2e4f0eb95f1da46f4c0f",
+      "ledger:previousEventHash": "sha256:4327c11f0ea8de5e858b95c88c870892194f3912d4a493a6d6c56ffed716944f",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:eastside-neighbors.example:agents:coordination#key-1",
+      "ledger:signature": "placeholder-signature-fe394faff514",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:05:00+00:00"
+      },
+      "rdfs:label": "Eastside re-issues Harborlight's housing tasks: locker agent adds the rule"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#capFollowUp",
+      "@type": "cap:Capability",
+      "cap:capabilityExpression": "Append the 7-day follow-up note to the clinical holon",
+      "cap:requiresPermission": "http://www.w3.org/ns/auth/acl#Append",
+      "rdfs:label": "Clinical follow-up"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#d2",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://harborlight.example/agents/intake#agent"
+      },
+      "del:delegationId": "C-D2",
+      "del:delegationScope": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb7"
+      },
+      "del:note": "Riverbend brings Harborlight in for housing tasks.",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#harborlight-via-riverbend"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb7",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T11:20:00+00:00"
+      },
+      "del:validUntil": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#d1",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegationId": "C-D1",
+      "del:delegationScope": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb6"
+      },
+      "del:note": "Riverbend coordinates (Tomasz's coordinator role).",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/.acl#riverbend-coordinator"
+      },
+      "ext:realizesParticipation": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-tomasz-coordinator"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb6",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": [
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#capCoordinate"
+        },
+        {
+          "@id": "https://example.org/sac/hhs/coordinator-handoff#capHousingTasks"
+        }
+      ],
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      },
+      "del:validUntil": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-samuel-coordinator",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#coordinator-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#handoffIntent",
+      "@type": "intent:Intent",
+      "intent:authorizedBy": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d1"
+      },
+      "intent:producesAction": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#actHandoffNote"
+      },
+      "rdfs:label": "Hand coordination to the community health worker with no gap and no leftover authority"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-tomasz-coordinator",
+      "@type": "ucm:Participation",
+      "ucm:assumesRole": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#coordinator-role"
+      },
+      "ucm:occursWithin": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination"
+      },
+      "ucm:scopedBy": {
+        "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#clinical-context"
+      },
+      "ucm:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-09-14T09:00:00+00:00"
+      },
+      "ucm:validTo": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/boundary.jsonld#coordinator-role",
+      "@type": "ucm:CoordinatorRole"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e06",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 6,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d1"
+      },
+      "ledger:eventId": "CH-006",
+      "ledger:governanceAction": {
+        "@id": "ext:Revoke"
+      },
+      "ledger:hash": "sha256:d619ebf4d522f373a0ce222c75e6dd6c551f48aa60884af91e0bdd51d6e86648",
+      "ledger:previousEventHash": "sha256:cbb469ce3c7f8ecd86463976265f04ca63ea580cb9d5783e51454a1ac9904487",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-d619ebf4d522",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      },
+      "rdfs:label": "Riverbend's coordinator rule removed from the .acl"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#open-tasks",
+      "@type": [
+        "core:Artifact",
+        "ucm:CareCoordinationStatement"
+      ],
+      "rdfs:label": "Open tasks at handoff: housing lease signing, 7-day follow-up call, pulse oximeter setup",
+      "ucm:madeWithinContext": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#social-context"
+      },
+      "ucm:statementDate": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      },
+      "ucm:statementSubject": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-samuel-coordinator"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/access-log/event.jsonld#e07",
+      "@type": "ledger:GovernanceLedgerEvent",
+      "hev:eventSequence": 7,
+      "ledger:actor": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "ledger:appendOnly": true,
+      "ledger:delegation": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#d3"
+      },
+      "ledger:eventId": "CH-007",
+      "ledger:governanceAction": {
+        "@id": "ext:Grant"
+      },
+      "ledger:hash": "sha256:6a4b5627bb05112be95a1955e34d13e4967698e75ff74ea891e78a67ec355df7",
+      "ledger:previousEventHash": "sha256:d619ebf4d522f373a0ce222c75e6dd6c551f48aa60884af91e0bdd51d6e86648",
+      "ledger:proofType": "DataIntegrityProof",
+      "ledger:publicKey": "did:web:pod.example:delphine#key-1",
+      "ledger:signature": "placeholder-signature-6a4b5627bb05",
+      "ledger:timestamp": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      },
+      "rdfs:label": "Riverbend's follow-up rule added to clinical/.acl"
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#tomasz",
+      "@type": "ucm:Person",
+      "rdfs:label": "Tomasz Brennan",
+      "ucm:affiliatedWith": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#riverbend"
+      },
+      "ucm:participatesThrough": [
+        {
+          "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-tomasz-coordinator"
+        },
+        {
+          "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-tomasz-provider"
+        }
+      ]
+    },
+    {
+      "@id": "https://example.org/sac/hhs/coordinator-handoff#d3",
+      "@type": "del:Delegation",
+      "del:delegatedBy": {
+        "@id": "https://pod.example/delphine/holon/boundary.jsonld#locker-agent"
+      },
+      "del:delegatesTo": {
+        "@id": "https://riverbend.example/agents/care-transitions#agent"
+      },
+      "del:delegationId": "C-D3",
+      "del:delegationScope": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb8"
+      },
+      "del:note": "Riverbend stays on for the follow-up call (Tomasz's provider role).",
+      "ext:consentRecord": {
+        "@id": "https://pod.example/delphine/holon/clinical/.acl#riverbend-follow-up"
+      },
+      "ext:realizesParticipation": {
+        "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#p-tomasz-provider"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb8",
+      "@type": "del:DelegationScope",
+      "del:allowedCapability": {
+        "@id": "https://example.org/sac/hhs/coordinator-handoff#capFollowUp"
+      },
+      "del:validFrom": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-02T12:00:00+00:00"
+      },
+      "del:validUntil": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-10-09T12:00:00+00:00"
+      }
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/discharge-coordination/event.jsonld#coordination",
+      "@type": "ucm:CareCoordinationInteraction",
+      "rdfs:label": "Discharge coordination",
+      "ucm:hasActivityFocus": {
+        "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb1"
+      }
+    },
+    {
+      "@id": "_:nf36fd7e8094f4d5486683ab2330186ecb1",
+      "@type": "ucm:ActivityFocus",
+      "rdfs:label": "Safe discharge to stable housing"
+    },
+    {
+      "@id": "https://pod.example/delphine/profile/card.jsonld#me",
+      "@type": "ucm:Person",
+      "rdfs:label": "Delphine Arceneaux"
+    },
+    {
+      "@id": "https://pod.example/delphine/holon/clinical/boundary.jsonld#clinical-context",
+      "@type": "ucm:ClinicalCareContext"
+    }
+  ]
+}
